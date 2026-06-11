@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Health Care Cockpit — Heisenbug demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #fbf8ef;
+  --paper-2: #fff;
+  --ink: #16201a;
+  --ink-2: #2a3a30;
+  --muted: #6a7068;
+  --line: #e2dccb;
+  --line-2: #d4cdb8;
+  --green: #1f6b3a;
+  --green-bright: #c6d97a;
+  --green-soft: #e8f0d4;
+  --green-deep: #0f1f0f;
+  --amber: #c69820;
+  --amber-soft: #fef0d0;
+  --rust: #b85318;
+  --rust-soft: #fce8de;
+  --blue: #1f5b88;
+  --blue-soft: #e0ecf5;
+  --red: #b82828;
+  --red-soft: #fbe5e5;
+  --shadow: 0 1px 2px rgba(15,31,15,0.04), 0 4px 16px rgba(15,31,15,0.04);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', -apple-system, 'Helvetica Neue', sans-serif;
+  font-size: 14px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+.serif { font-family: 'Fraunces', 'Source Serif Pro', Georgia, serif; }
+.mono { font-family: 'JetBrains Mono', 'SF Mono', monospace; }
+
+/* ── shell ─────────────────────────────────────────────────────────── */
+.shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar {
+  background: var(--green-deep); color: #d8e0d4;
+  padding: 22px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  border-right: 1px solid #0a1a0a;
+}
+.sidebar .brand {
+  font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500;
+  color: var(--green-bright); letter-spacing: -0.3px; margin: 0 6px 6px;
+}
+.sidebar .brand small { display: block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: #8a9088; margin-top: 4px; font-weight: 400; }
+.sidebar .nav {
+  display: flex; flex-direction: column; gap: 1px; margin-top: 16px;
+}
+.sidebar .nav-cat {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.6px;
+  color: #6a7068; text-transform: uppercase; padding: 12px 8px 4px; font-weight: 500;
+}
+.sidebar .nav button {
+  background: transparent; border: none; color: #b8c0b4;
+  padding: 9px 10px; border-radius: 6px;
+  text-align: left; font-family: inherit; font-size: 13.5px; font-weight: 500;
+  cursor: pointer; display: flex; align-items: center; gap: 9px;
+  transition: background 80ms;
+}
+.sidebar .nav button:hover { background: rgba(255,255,255,0.04); color: #e0e8d8; }
+.sidebar .nav button.active { background: rgba(198,217,122,0.12); color: var(--green-bright); }
+.sidebar .nav button .ic { width: 18px; display: inline-flex; justify-content: center; font-size: 14px; }
+.sidebar .nav button .badge { margin-left: auto; background: var(--rust); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+.sidebar .footer {
+  margin-top: auto; padding: 12px 8px;
+  border-top: 1px solid #1a2a1a;
+  font-size: 11.5px; color: #6a7068;
+}
+.sidebar .footer .user { display: flex; align-items: center; gap: 9px; color: #b8c0b4; font-weight: 500; }
+.sidebar .footer .user .av { width: 24px; height: 24px; border-radius: 50%; background: var(--rust); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; }
+
+.main { background: var(--paper); }
+.topbar {
+  background: var(--paper-2); border-bottom: 1px solid var(--line);
+  padding: 14px 28px; display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar h1 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; letter-spacing: -0.2px; }
+.topbar .crumb { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1.6px; text-transform: uppercase; margin-left: 4px; }
+.topbar .right { margin-left: auto; display: flex; gap: 8px; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.4px; }
+.topbar .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+.content { padding: 22px 28px 80px; max-width: 1280px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.panel-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 18px; gap: 16px; flex-wrap: wrap; }
+.panel-head h2 { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 500; letter-spacing: -0.4px; line-height: 1.1; }
+.panel-head .sub { color: var(--muted); margin-top: 4px; font-size: 13.5px; max-width: 580px; }
+.panel-head .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 1.6px; text-transform: uppercase; margin-bottom: 6px; font-weight: 500; }
+.panel-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── cards ────────────────────────────────────────────────────────── */
+.card { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); }
+.card h3 { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+.card .label { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); letter-spacing: 1.6px; text-transform: uppercase; font-weight: 500; }
+
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+.kpi { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.kpi .label { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); letter-spacing: 1.6px; text-transform: uppercase; font-weight: 500; }
+.kpi .num { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 500; letter-spacing: -0.5px; line-height: 1.1; margin-top: 4px; }
+.kpi .delta { font-size: 11.5px; color: var(--green); margin-top: 4px; font-weight: 600; }
+.kpi .delta.dn { color: var(--rust); }
+
+/* ── pills ────────────────────────────────────────────────────────── */
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.2px; }
+.pill.green { background: var(--green-soft); color: var(--green); }
+.pill.amber { background: var(--amber-soft); color: var(--amber); }
+.pill.rust  { background: var(--rust-soft); color: var(--rust); }
+.pill.red   { background: var(--red-soft); color: var(--red); }
+.pill.blue  { background: var(--blue-soft); color: var(--blue); }
+.pill.dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 2px; }
+
+/* ── buttons ──────────────────────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px; border: 1px solid var(--line-2); background: var(--paper-2); color: var(--ink); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 100ms; }
+.btn:hover { background: #fbf6e0; border-color: var(--amber); }
+.btn.primary { background: var(--green); color: white; border-color: var(--green); }
+.btn.primary:hover { background: var(--green-deep); border-color: var(--green-deep); }
+.btn.sm { padding: 4px 10px; font-size: 11.5px; font-weight: 500; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { background: var(--paper-2); color: var(--ink); }
+
+/* ── schedule panel ──────────────────────────────────────────────── */
+.schedule-grid { display: grid; grid-template-columns: 180px 1fr; gap: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.schedule-grid .col-head { background: #f4eed8; border-bottom: 1px solid var(--line); padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.schedule-grid .cg-row { display: contents; }
+.cg-cell { padding: 12px 14px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+.cg-cell.name { background: #fcf9ec; }
+.cg-cell .av { width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 600; }
+.cg-cell .nm { font-weight: 600; font-size: 13px; }
+.cg-cell .role { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.8px; text-transform: uppercase; }
+.visits-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 9px 12px; }
+.visit { background: var(--green-soft); border: 1px solid #d3dfb8; border-radius: 6px; padding: 6px 9px; font-size: 11.5px; cursor: pointer; transition: all 100ms; min-width: 100px; }
+.visit:hover { background: #dde6c2; }
+.visit.amber { background: var(--amber-soft); border-color: #e8d090; }
+.visit.rust { background: var(--rust-soft); border-color: #e8b890; }
+.visit .vtime { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.4px; }
+.visit .vpt { font-weight: 600; font-size: 12px; margin-top: 1px; }
+.visit .vtag { font-size: 9.5px; color: var(--muted); margin-top: 2px; }
+.visit.open { background: white; border: 1px dashed #d4cdb8; color: var(--muted); text-align: center; }
+.visit.open:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+
+/* ── EVV panel ────────────────────────────────────────────────────── */
+.evv-grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; }
+.phone {
+  background: #1a1a1a; border-radius: 36px; padding: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25), inset 0 0 0 2px #2a2a2a;
+  position: relative;
+}
+.phone .notch { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 80px; height: 22px; background: #0a0a0a; border-radius: 14px; }
+.phone-screen { background: var(--paper); border-radius: 22px; padding: 38px 14px 18px; min-height: 540px; display: flex; flex-direction: column; }
+.phone-top { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-bottom: 12px; }
+.phone-h { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; margin-bottom: 2px; }
+.phone-sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+.evv-status { background: var(--green-soft); border: 1px solid #c5d4a0; border-radius: 8px; padding: 11px; margin-bottom: 14px; font-size: 12px; }
+.evv-status .row { display: flex; justify-content: space-between; margin: 2px 0; }
+.evv-status .row .k { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+.evv-status .row .v { font-weight: 600; }
+.task { padding: 9px 11px; background: white; border: 1px solid var(--line); border-radius: 6px; margin-bottom: 6px; font-size: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 100ms; }
+.task:hover { background: #fcfaf3; }
+.task .check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--line-2); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; color: white; flex-shrink: 0; }
+.task.done .check { background: var(--green); border-color: var(--green); }
+.task.done .check::after { content: '✓'; }
+.task.done .nm { color: var(--muted); text-decoration: line-through; }
+.task .nm { font-size: 12px; }
+.phone-cta { margin-top: auto; background: var(--green); color: white; padding: 13px; border-radius: 10px; text-align: center; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.phone-cta:hover { background: var(--green-deep); }
+.evv-side h3 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; margin-bottom: 6px; }
+.evv-side .info { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.evv-log { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 0; box-shadow: var(--shadow); }
+.evv-log .lh { padding: 11px 14px; border-bottom: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.evv-log .row { padding: 9px 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 80px 1fr 90px 70px; gap: 10px; font-size: 12px; align-items: center; }
+.evv-log .row:last-child { border-bottom: none; }
+.evv-log .row .tm { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.evv-log .row .nm { font-weight: 600; }
+.evv-log .row .pt { font-size: 11.5px; color: var(--muted); }
+
+/* ── patients panel ─────────────────────────────────────────────── */
+.patients-grid { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+.pt-list { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+.pt-list .lh { padding: 11px 14px; border-bottom: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.pt-list .pt { padding: 11px 14px; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 80ms; }
+.pt-list .pt:hover { background: #fcf9ec; }
+.pt-list .pt.sel { background: var(--green-soft); border-left: 3px solid var(--green); padding-left: 11px; }
+.pt-list .pt:last-child { border-bottom: none; }
+.pt-list .pt .nm { font-weight: 600; font-size: 13.5px; }
+.pt-list .pt .meta { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+.pt-detail { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 20px; box-shadow: var(--shadow); }
+.pt-detail .pt-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.pt-detail .pt-h .nm { font-family: 'Fraunces', serif; font-size: 24px; font-weight: 500; }
+.pt-detail .pt-h .meta { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.pt-section { margin-top: 16px; }
+.pt-section h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; font-weight: 500; }
+.care-task { display: flex; align-items: center; gap: 9px; padding: 7px 10px; background: #fbf6e0; border-radius: 6px; margin-bottom: 4px; font-size: 12.5px; }
+.care-task .freq { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.5px; }
+.visit-history { display: grid; grid-template-columns: 110px 130px 1fr 60px; gap: 8px; padding: 7px 10px; font-size: 12px; border-bottom: 1px solid var(--line); }
+.visit-history:last-child { border: none; }
+.visit-history .dt { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* ── family panel ───────────────────────────────────────────────── */
+.family-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.family-side h3 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; margin-bottom: 4px; }
+.family-side .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+.summary-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); }
+.summary-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 11px; border-bottom: 1px solid var(--line); }
+.summary-card .header .when { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.summary-card .header .nm { font-weight: 600; }
+.summary-line { display: flex; gap: 10px; padding: 8px 0; font-size: 13px; border-bottom: 1px dashed var(--line); }
+.summary-line:last-of-type { border: none; }
+.summary-line .lbl { color: var(--muted); width: 100px; font-size: 12px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; }
+.summary-line .v { flex: 1; }
+.msg-thread { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 9px; max-height: 480px; overflow-y: auto; }
+.msg { padding: 8px 12px; border-radius: 10px; max-width: 78%; font-size: 13px; line-height: 1.4; }
+.msg.in { background: var(--blue-soft); align-self: flex-start; border-bottom-left-radius: 3px; }
+.msg.out { background: var(--green-soft); align-self: flex-end; border-bottom-right-radius: 3px; }
+.msg .meta { display: block; font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-top: 3px; letter-spacing: 0.4px; }
+.msg-input { margin-top: 10px; display: flex; gap: 8px; }
+.msg-input input { flex: 1; padding: 9px 12px; border: 1px solid var(--line-2); border-radius: 8px; font-family: inherit; font-size: 13px; background: var(--paper-2); }
+.msg-input input:focus { outline: 2px solid var(--green-bright); outline-offset: -1px; border-color: var(--green); }
+
+/* ── compliance panel ───────────────────────────────────────────── */
+.comp-table { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+.comp-table .hdr, .comp-table .row { display: grid; grid-template-columns: 200px 100px 110px 110px 110px 110px 1fr; gap: 12px; padding: 11px 16px; align-items: center; }
+.comp-table .hdr { background: #f4eed8; border-bottom: 1px solid var(--line); font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.comp-table .row { border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.comp-table .row:last-child { border: none; }
+.comp-table .row:hover { background: #fcf9ec; }
+.comp-table .nm { font-weight: 600; }
+.comp-table .nm small { display: block; font-weight: 500; color: var(--muted); font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; margin-top: 1px; }
+.comp-table .cert { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+/* ── billing panel ──────────────────────────────────────────────── */
+.bill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.bill-row { display: grid; grid-template-columns: 100px 1fr 110px 110px 80px; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); align-items: center; font-size: 12.5px; }
+.bill-row:last-child { border: none; }
+.bill-row:hover { background: #fcf9ec; }
+.bill-row .dt { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.bill-row .nm { font-weight: 600; }
+.bill-row .amt { font-family: 'Fraunces', serif; font-weight: 500; text-align: right; font-size: 14px; }
+.bill-row .stat { text-align: right; }
+.bill-summary { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.bill-summary .row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+.bill-summary .row.total { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 11px; font-weight: 600; font-size: 14px; }
+.bill-summary .row .v { font-family: 'Fraunces', serif; font-weight: 500; }
+
+/* ── footer banner ──────────────────────────────────────────────── */
+.demo-banner {
+  background: linear-gradient(135deg, #0f1f0f 0%, #1a3a1a 100%);
+  color: var(--green-bright);
+  padding: 14px 28px; margin: 32px -28px -80px;
+  border-top: 1px solid var(--green);
+  font-size: 12.5px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.demo-banner .mono { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8a9088; letter-spacing: 1.6px; text-transform: uppercase; }
+.demo-banner a { color: var(--green-bright); margin-left: auto; padding: 8px 16px; border: 1px solid var(--green-bright); border-radius: 6px; font-weight: 600; text-decoration: none; font-size: 12.5px; }
+.demo-banner a:hover { background: var(--green-bright); color: var(--green-deep); }
+
+/* ── responsive ─────────────────────────────────────────────────── */
+@media (max-width: 1000px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { flex-direction: row; padding: 12px 14px; overflow-x: auto; gap: 4px; align-items: center; }
+  .sidebar .brand, .sidebar .nav-cat, .sidebar .footer { display: none; }
+  .sidebar .nav { flex-direction: row; gap: 2px; }
+  .sidebar .nav button { white-space: nowrap; padding: 6px 10px; font-size: 12.5px; }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .evv-grid, .patients-grid, .family-grid, .bill-grid { grid-template-columns: 1fr; }
+  .comp-table .hdr, .comp-table .row { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">Heisenbug<small>Home Health Care</small></div>
+
+    <div class="nav-cat">Today</div>
+    <div class="nav">
+      <button class="nav-btn active" data-panel="schedule"><span class="ic">▦</span>Schedule<span class="badge">7</span></button>
+      <button class="nav-btn" data-panel="evv"><span class="ic">●</span>EVV check-in</button>
+    </div>
+
+    <div class="nav-cat">Patients</div>
+    <div class="nav">
+      <button class="nav-btn" data-panel="patients"><span class="ic">◉</span>Care plans</button>
+      <button class="nav-btn" data-panel="family"><span class="ic">✉</span>Family<span class="badge">3</span></button>
+    </div>
+
+    <div class="nav-cat">Agency</div>
+    <div class="nav">
+      <button class="nav-btn" data-panel="compliance"><span class="ic">▲</span>Compliance<span class="badge">2</span></button>
+      <button class="nav-btn" data-panel="billing"><span class="ic">$</span>Billing</button>
+    </div>
+
+    <div class="footer">
+      <div class="user"><span class="av">RM</span><div>Rosa Martinez<br><span style="font-size:10.5px;color:#6a7068;">Agency Administrator</span></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="topbar-title">Today's schedule</h1>
+      <span class="crumb" id="topbar-crumb">12 caregivers · 47 patients · 7 unstaffed</span>
+      <div class="right">
+        <span class="status-dot"></span>EVV synced · 2 min ago
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ─── SCHEDULE ──────────────────────────────────────────── -->
+      <div class="panel active" data-panel="schedule">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Today · Wed Jun 10</div>
+            <h2>Today's caregiver schedule</h2>
+            <p class="sub">All visits across all caregivers. Drag a patient onto an open slot to assign. Routing engine respects certification match, hours-of-service, and patient time-windows.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">Print routes</button>
+            <button class="btn primary">Auto-fill 7 open visits</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Visits today</div><div class="num">47</div><div class="delta">+3 vs yesterday</div></div>
+          <div class="kpi"><div class="label">Caregivers active</div><div class="num">12</div><div class="delta">100% credentialed</div></div>
+          <div class="kpi"><div class="label">Open / unstaffed</div><div class="num" style="color:var(--rust);">7</div><div class="delta dn">Need to assign by 9am</div></div>
+          <div class="kpi"><div class="label">EVV compliance</div><div class="num" style="color:var(--green);">98.4%</div><div class="delta">+0.8% MoM</div></div>
+        </div>
+
+        <div class="schedule-grid">
+          <div class="col-head">Caregiver</div>
+          <div class="col-head">Today's visits · 7am → 7pm</div>
+
+          <div class="cg-cell name"><span class="av">MA</span><div><div class="nm">Maria Alvarez</div><div class="role">PCA · Spanish</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">7:30a · 60m</div><div class="vpt">Eleanor R.</div><div class="vtag">Personal care</div></div>
+            <div class="visit"><div class="vtime">9:15a · 90m</div><div class="vpt">Harold S.</div><div class="vtag">Medication mgmt</div></div>
+            <div class="visit"><div class="vtime">11:30a · 60m</div><div class="vpt">Beatrice K.</div><div class="vtag">Bathing assist</div></div>
+            <div class="visit amber"><div class="vtime">1:30p · 45m</div><div class="vpt">Frank D.</div><div class="vtag">Late start risk</div></div>
+            <div class="visit"><div class="vtime">3:00p · 90m</div><div class="vpt">Margaret W.</div><div class="vtag">Meal prep · companion</div></div>
+          </div>
+
+          <div class="cg-cell name"><span class="av" style="background:var(--green);">JT</span><div><div class="nm">Jennifer Thompson</div><div class="role">RN · Wound care</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">8:00a · 45m</div><div class="vpt">Robert L.</div><div class="vtag">Wound · post-op</div></div>
+            <div class="visit"><div class="vtime">9:30a · 30m</div><div class="vpt">Doris M.</div><div class="vtag">Vitals · INR check</div></div>
+            <div class="visit"><div class="vtime">11:00a · 60m</div><div class="vpt">Patricia G.</div><div class="vtag">Wound · diabetic</div></div>
+            <div class="visit"><div class="vtime">1:00p · 60m</div><div class="vpt">William F.</div><div class="vtag">Cath care</div></div>
+            <div class="visit open">+ Open slot · 3:00p</div>
+          </div>
+
+          <div class="cg-cell name"><span class="av" style="background:var(--rust);">DR</span><div><div class="nm">Daniel Reyes</div><div class="role">HHA · Cert TB-21</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">7:00a · 90m</div><div class="vpt">Catherine B.</div><div class="vtag">Bathing · ambulation</div></div>
+            <div class="visit"><div class="vtime">9:30a · 60m</div><div class="vpt">Joseph H.</div><div class="vtag">Personal care</div></div>
+            <div class="visit"><div class="vtime">11:30a · 60m</div><div class="vpt">Linda O.</div><div class="vtag">Bathing assist</div></div>
+            <div class="visit open">+ Open slot · 1:30p</div>
+            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Nancy P.</div><div class="vtag">Light housekeeping</div></div>
+          </div>
+
+          <div class="cg-cell name"><span class="av" style="background:#8a3a78;">SK</span><div><div class="nm">Sophia Kim</div><div class="role">PT · Mobility</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">8:30a · 60m</div><div class="vpt">Charles N.</div><div class="vtag">Post-stroke gait</div></div>
+            <div class="visit"><div class="vtime">10:30a · 60m</div><div class="vpt">Helen T.</div><div class="vtag">Balance · falls prev</div></div>
+            <div class="visit"><div class="vtime">1:00p · 60m</div><div class="vpt">George V.</div><div class="vtag">Knee rehab post-op</div></div>
+            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Lillian Z.</div><div class="vtag">Strength · arthritis</div></div>
+          </div>
+
+          <div class="cg-cell name"><span class="av" style="background:#2a5a2a;">CW</span><div><div class="nm">Carlos Whitfield</div><div class="role">PCA · Bilingual</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">7:30a · 45m</div><div class="vpt">Theresa I.</div><div class="vtag">Companion · meds</div></div>
+            <div class="visit rust"><div class="vtime">9:00a · 60m</div><div class="vpt">Edward C.</div><div class="vtag">Refused last 2 visits</div></div>
+            <div class="visit"><div class="vtime">11:00a · 90m</div><div class="vpt">Florence Y.</div><div class="vtag">Personal care</div></div>
+            <div class="visit open">+ Open slot · 2:00p</div>
+            <div class="visit open">+ Open slot · 4:00p</div>
+          </div>
+
+          <div class="cg-cell name"><span class="av" style="background:#5a2a8a;">LM</span><div><div class="nm">Lakshmi Menon</div><div class="role">OT · Adaptive</div></div></div>
+          <div class="visits-row">
+            <div class="visit"><div class="vtime">9:00a · 60m</div><div class="vpt">Albert J.</div><div class="vtag">ADL · hand</div></div>
+            <div class="visit"><div class="vtime">11:00a · 60m</div><div class="vpt">Vivian Q.</div><div class="vtag">Kitchen adapt</div></div>
+            <div class="visit open">+ Open slot · 1:30p</div>
+            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Henry X.</div><div class="vtag">Bath safety eval</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── EVV ──────────────────────────────────────────────── -->
+      <div class="panel" data-panel="evv">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Federal mandate · 21st Century Cures Act</div>
+            <h2>EVV check-in flow</h2>
+            <p class="sub">The Electronic Visit Verification screen the caregiver sees on the phone at the patient's location. GPS-locked + task completion + biometric confirm. Auto-syncs to state EVV aggregator.</p>
+          </div>
+        </div>
+
+        <div class="evv-grid">
+          <div>
+            <div class="phone">
+              <div class="notch"></div>
+              <div class="phone-screen">
+                <div class="phone-top">
+                  <span>9:14</span>
+                  <span>● ● ● ● ●</span>
+                </div>
+                <div class="phone-h">Visit · Eleanor Rodriguez</div>
+                <div class="phone-sub">412 W Oak St · scheduled 9:00–10:00 AM</div>
+
+                <div class="evv-status">
+                  <div class="row"><span class="k">Status</span><span class="v" style="color:var(--green);">● Checked in 9:04 AM</span></div>
+                  <div class="row"><span class="k">GPS</span><span class="v">412 W Oak St · 4m accuracy</span></div>
+                  <div class="row"><span class="k">Biometric</span><span class="v">Verified · Face ID</span></div>
+                </div>
+
+                <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin-bottom:7px;">Care plan · 5 tasks</div>
+
+                <div class="task done"><div class="check"></div><div class="nm">Personal care · bathing assist</div></div>
+                <div class="task done"><div class="check"></div><div class="nm">Medication reminder · 9:30 AM</div></div>
+                <div class="task done"><div class="check"></div><div class="nm">Vitals · BP 132/78 logged</div></div>
+                <div class="task"><div class="check"></div><div class="nm">Light housekeeping · kitchen</div></div>
+                <div class="task"><div class="check"></div><div class="nm">Observation note (optional)</div></div>
+
+                <div class="phone-cta">Check out · 56 min elapsed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="evv-side">
+            <h3>Why every state inspector loves this view</h3>
+            <p class="info">EVV failures are how agencies lose Medicaid certification. The phone screen above produces a verified audit record per visit: who was there, when they arrived, when they left, what tasks were performed, GPS-locked location. Auto-syncs to your state's EVV aggregator (Sandata, HHAeXchange, Tellus, or state-specific) in the format they require. No double entry.</p>
+
+            <div class="evv-log">
+              <div class="lh">Today's verified visits · live log</div>
+              <div class="row"><span class="tm">9:04 AM</span><div><div class="nm">Maria Alvarez</div><div class="pt">→ Eleanor Rodriguez · 60m visit</div></div><span class="pill green dot">In progress</span><span class="mono" style="font-size:10px; color:var(--muted);">GPS ✓</span></div>
+              <div class="row"><span class="tm">8:34 AM</span><div><div class="nm">Daniel Reyes</div><div class="pt">→ Catherine Bell · 90m completed</div></div><span class="pill green dot">Verified</span><span class="mono" style="font-size:10px; color:var(--muted);">Synced</span></div>
+              <div class="row"><span class="tm">8:11 AM</span><div><div class="nm">Jennifer Thompson</div><div class="pt">→ Robert Lin · 45m wound care</div></div><span class="pill green dot">Verified</span><span class="mono" style="font-size:10px; color:var(--muted);">Synced</span></div>
+              <div class="row"><span class="tm">8:02 AM</span><div><div class="nm">Sophia Kim</div><div class="pt">→ Charles Nguyen · 60m PT</div></div><span class="pill green dot">Verified</span><span class="mono" style="font-size:10px; color:var(--muted);">Synced</span></div>
+              <div class="row"><span class="tm">7:42 AM</span><div><div class="nm">Carlos Whitfield</div><div class="pt">→ Theresa Iverson · 45m</div></div><span class="pill amber dot">Edit pending</span><span class="mono" style="font-size:10px; color:var(--muted);">GPS off-site</span></div>
+              <div class="row"><span class="tm">7:34 AM</span><div><div class="nm">Maria Alvarez</div><div class="pt">→ Eleanor Rodriguez · cancelled</div></div><span class="pill rust dot">Patient refused</span><span class="mono" style="font-size:10px; color:var(--muted);">Reason logged</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PATIENTS ─────────────────────────────────────────── -->
+      <div class="panel" data-panel="patients">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Per-patient care plans</div>
+            <h2>Care plans</h2>
+            <p class="sub">One source of truth per patient. Care plan tasks, visit history with observations, family contact, RN supervisory notes. Updates from any caregiver, RN, or physician order propagate immediately.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">Filter</button>
+            <button class="btn primary">+ New patient</button>
+          </div>
+        </div>
+
+        <div class="patients-grid">
+          <div class="pt-list">
+            <div class="lh">47 active patients</div>
+            <div class="pt sel"><div class="nm">Eleanor Rodriguez</div><div class="meta">82 · Medicaid waiver · 5 visits/wk</div></div>
+            <div class="pt"><div class="nm">Harold Steinberg</div><div class="meta">79 · Skilled · post-CHF</div></div>
+            <div class="pt"><div class="nm">Robert Lin</div><div class="meta">71 · Skilled · post-surgical</div></div>
+            <div class="pt"><div class="nm">Beatrice Klein</div><div class="meta">88 · Non-medical · private pay</div></div>
+            <div class="pt"><div class="nm">Margaret Wong</div><div class="meta">76 · Companion · Medicaid</div></div>
+            <div class="pt"><div class="nm">Charles Nguyen</div><div class="meta">68 · PT · post-stroke</div></div>
+            <div class="pt"><div class="nm">Catherine Bell</div><div class="meta">85 · Bathing + ambulation</div></div>
+            <div class="pt"><div class="nm">Patricia Garcia</div><div class="meta">73 · Diabetic wound care</div></div>
+          </div>
+
+          <div class="pt-detail">
+            <div class="pt-h">
+              <div>
+                <div class="nm">Eleanor Rodriguez</div>
+                <div class="meta">82 yo · Female · 412 W Oak St · Medicaid waiver #M-4421</div>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <span class="pill green dot">Active</span>
+                <span class="pill blue">Spanish-pref</span>
+                <span class="pill amber">DNR on file</span>
+              </div>
+            </div>
+
+            <div class="pt-section">
+              <h4>Care plan · 5 visits/week · approved by RN Thompson 2026-05-22</h4>
+              <div class="care-task">Personal care · bathing assist <span class="freq">5x/wk</span></div>
+              <div class="care-task">Medication reminder · BP meds, anticoag <span class="freq">5x/wk · 9:30 AM</span></div>
+              <div class="care-task">Vitals capture · BP, pulse, weight Mon/Wed/Fri <span class="freq">3x/wk</span></div>
+              <div class="care-task">Light housekeeping · kitchen, bathroom <span class="freq">5x/wk</span></div>
+              <div class="care-task">Companionship + meal prep · lunch <span class="freq">3x/wk</span></div>
+            </div>
+
+            <div class="pt-section">
+              <h4>Recent visits</h4>
+              <div class="visit-history"><span class="dt">Jun 10 · today</span><span>Maria Alvarez</span><span style="color:var(--muted);">In progress · checked in 9:04</span><span class="pill green dot" style="font-size:10px;">Live</span></div>
+              <div class="visit-history"><span class="dt">Jun 9 · Mon</span><span>Maria Alvarez</span><span>BP 128/76 · all tasks complete</span><span class="pill green" style="font-size:10px;">Done</span></div>
+              <div class="visit-history"><span class="dt">Jun 7 · Sat</span><span>Carlos Whitfield</span><span>Light housekeeping. Family present.</span><span class="pill green" style="font-size:10px;">Done</span></div>
+              <div class="visit-history"><span class="dt">Jun 6 · Fri</span><span>Maria Alvarez</span><span>BP 134/82. Mentioned dizziness AM — RN flagged.</span><span class="pill amber" style="font-size:10px;">Flag</span></div>
+              <div class="visit-history"><span class="dt">Jun 5 · Thu</span><span>Maria Alvarez</span><span>All tasks complete. Patient cheerful.</span><span class="pill green" style="font-size:10px;">Done</span></div>
+            </div>
+
+            <div class="pt-section">
+              <h4>Family contact</h4>
+              <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:10px;">
+                <div style="background:#fcf9ec; padding:10px 12px; border-radius:8px;"><div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">DAUGHTER · PRIMARY</div><div style="font-weight:600; margin-top:2px;">Sofia Rodriguez-Hill</div><div style="font-size:12px; color:var(--muted);">(210) 555-0184 · daily summary opt-in</div></div>
+                <div style="background:#fcf9ec; padding:10px 12px; border-radius:8px;"><div style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:0.5px;">SON · EMERGENCY ONLY</div><div style="font-weight:600; margin-top:2px;">Miguel Rodriguez</div><div style="font-size:12px; color:var(--muted);">(512) 555-2207 · escalation #2</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── FAMILY ───────────────────────────────────────────── -->
+      <div class="panel" data-panel="family">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Family communication</div>
+            <h2>Family view + secure messaging</h2>
+            <p class="sub">What family members see on their phone. Sanitized post-visit summary, HIPAA-compliant message thread. Configurable per patient: opt-in cadence, what details to share, who gets which alerts.</p>
+          </div>
+        </div>
+
+        <div class="family-grid">
+          <div class="family-side">
+            <h3>Sofia's view · daughter of Eleanor R.</h3>
+            <p class="sub">Daily post-visit summary, delivered to her phone within 15 min of the caregiver checking out.</p>
+            <div class="summary-card">
+              <div class="header">
+                <div><div class="nm">Today's visit · Eleanor</div><div style="font-size:11px; color:var(--muted);">Maria Alvarez · PCA</div></div>
+                <div class="when">9:04 AM → 10:00 AM</div>
+              </div>
+              <div class="summary-line"><div class="lbl">Mood</div><div class="v">Cheerful. Asked about the grandkids.</div></div>
+              <div class="summary-line"><div class="lbl">Tasks</div><div class="v">Bathing assist · medication reminder · BP check · housekeeping</div></div>
+              <div class="summary-line"><div class="lbl">Vitals</div><div class="v">BP 132/78 · pulse 74 · within range</div></div>
+              <div class="summary-line"><div class="lbl">Meds</div><div class="v">Took morning BP + anticoag with breakfast</div></div>
+              <div class="summary-line"><div class="lbl">Note</div><div class="v">Mentioned she'd like to call you later today.</div></div>
+              <div style="margin-top:14px; padding-top:11px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+                <span class="pill green dot">Visit verified</span>
+                <button class="btn sm">Reply to caregiver</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="family-side">
+            <h3>Message thread · Sofia ↔ Agency</h3>
+            <p class="sub">HIPAA-compliant. Caregivers, RN supervisor, and family on one thread per patient.</p>
+            <div class="msg-thread">
+              <div class="msg in">Hi — saw the note about the dizziness on Friday. Should we be worried? Has she had it before?<span class="meta">Sofia · Fri 8:42 PM</span></div>
+              <div class="msg out">Hi Sofia. RN Thompson reviewed Friday's visit. She'd like to do a vitals + medication review Monday morning. Not concerning yet, but worth tracking. We'll watch BP closely this week.<span class="meta">Jennifer T. (RN) · Fri 9:14 PM</span></div>
+              <div class="msg in">Thank you. Please let me know what Monday turns up.<span class="meta">Sofia · Fri 9:17 PM</span></div>
+              <div class="msg out">Monday update: BP 128/76, no dizziness reported. Maria says mom was sharp + cheerful. We'll keep monitoring.<span class="meta">Jennifer T. (RN) · Mon 11:30 AM</span></div>
+              <div class="msg in">That's a relief. Thanks for keeping me posted.<span class="meta">Sofia · Mon 12:08 PM</span></div>
+              <div class="msg out">Today's summary just went out. BP 132/78, all tasks complete. She mentioned wanting to call you later.<span class="meta">System · today 10:04 AM</span></div>
+            </div>
+            <div class="msg-input">
+              <input type="text" placeholder="Reply to Sofia…">
+              <button class="btn primary">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── COMPLIANCE ──────────────────────────────────────── -->
+      <div class="panel" data-panel="compliance">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Caregiver compliance · auto-blocking</div>
+            <h2>License + cert + background tracker</h2>
+            <p class="sub">Every caregiver's CPR, TB, background check, state license, and required training tracked. Auto-alerts before expiry. Schedule blocks any caregiver with a lapsed credential before they can be assigned a visit.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">Export audit log</button>
+            <button class="btn primary">Renewal reminders</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Active caregivers</div><div class="num">12</div></div>
+          <div class="kpi"><div class="label">Full compliance</div><div class="num" style="color:var(--green);">10</div><div class="delta">83%</div></div>
+          <div class="kpi"><div class="label">Expiring &lt; 30 days</div><div class="num" style="color:var(--amber);">2</div><div class="delta dn">Email sent</div></div>
+          <div class="kpi"><div class="label">Lapsed · blocked</div><div class="num" style="color:var(--rust);">0</div><div class="delta">Last lapse 2 mo ago</div></div>
+        </div>
+
+        <div class="comp-table">
+          <div class="hdr">
+            <div>Caregiver · role</div>
+            <div>State license</div>
+            <div>CPR / FA</div>
+            <div>TB test</div>
+            <div>BG check</div>
+            <div>HHA training</div>
+            <div>Status</div>
+          </div>
+          <div class="row"><div class="nm">Maria Alvarez<small>PCA · Spanish</small></div><div class="cert">2027-08-14</div><div class="cert">2027-03-02</div><div class="cert">2026-11-08</div><div class="cert">2027-01-15</div><div class="cert">2027-06-12</div><div><span class="pill green dot">Full compliance</span></div></div>
+          <div class="row"><div class="nm">Jennifer Thompson<small>RN · Wound</small></div><div class="cert">2028-02-04</div><div class="cert">2026-12-19</div><div class="cert">2027-02-10</div><div class="cert">2028-04-22</div><div class="cert">N/A · RN</div><div><span class="pill green dot">Full compliance</span></div></div>
+          <div class="row"><div class="nm">Daniel Reyes<small>HHA · TB-21</small></div><div class="cert">2027-04-30</div><div class="cert" style="color:var(--amber);">2026-07-08</div><div class="cert">2027-05-15</div><div class="cert">2027-02-28</div><div class="cert">2027-08-04</div><div><span class="pill amber dot">CPR &lt; 30d</span></div></div>
+          <div class="row"><div class="nm">Sophia Kim<small>PT · Mobility</small></div><div class="cert">2028-01-19</div><div class="cert">2027-09-30</div><div class="cert">2027-01-08</div><div class="cert">2028-03-12</div><div class="cert">N/A · PT</div><div><span class="pill green dot">Full compliance</span></div></div>
+          <div class="row"><div class="nm">Carlos Whitfield<small>PCA · Bilingual</small></div><div class="cert">2026-10-22</div><div class="cert">2027-05-14</div><div class="cert" style="color:var(--amber);">2026-07-02</div><div class="cert">2027-09-18</div><div class="cert">2027-04-30</div><div><span class="pill amber dot">TB &lt; 30d</span></div></div>
+          <div class="row"><div class="nm">Lakshmi Menon<small>OT · Adaptive</small></div><div class="cert">2027-12-08</div><div class="cert">2027-06-20</div><div class="cert">2026-11-30</div><div class="cert">2028-05-05</div><div class="cert">N/A · OT</div><div><span class="pill green dot">Full compliance</span></div></div>
+          <div class="row"><div class="nm">Aisha Patel<small>HHA · Bilingual</small></div><div class="cert">2027-11-04</div><div class="cert">2027-09-08</div><div class="cert">2027-02-22</div><div class="cert">2027-12-30</div><div class="cert">2027-07-15</div><div><span class="pill green dot">Full compliance</span></div></div>
+          <div class="row"><div class="nm">Robert Chen<small>RN · Geriatric</small></div><div class="cert">2028-03-30</div><div class="cert">2027-10-12</div><div class="cert">2027-04-08</div><div class="cert">2028-06-22</div><div class="cert">N/A · RN</div><div><span class="pill green dot">Full compliance</span></div></div>
+        </div>
+      </div>
+
+      <!-- ─── BILLING ─────────────────────────────────────────── -->
+      <div class="panel" data-panel="billing">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ Medicare + Medicaid + Private pay</div>
+            <h2>Visit-to-billing batch</h2>
+            <p class="sub">Verified EVV visits become billable units. State-specific claim formats. Denial tracking with reason codes. Private-pay invoices auto-generated with hour breakdowns. No double entry.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">Period: Jun 1 → 10</button>
+            <button class="btn primary">Submit batch · 4 ready</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Verified visits</div><div class="num">427</div><div class="delta">+8% MoM</div></div>
+          <div class="kpi"><div class="label">Billable hours</div><div class="num">624</div><div class="delta">Jun 1 → 10</div></div>
+          <div class="kpi"><div class="label">Pending revenue</div><div class="num">$48.3k</div><div class="delta">4 batches ready</div></div>
+          <div class="kpi"><div class="label">Denials this month</div><div class="num" style="color:var(--amber);">3</div><div class="delta dn">All EVV-fixable</div></div>
+        </div>
+
+        <div class="bill-grid">
+          <div>
+            <div class="bill-summary">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin-bottom:11px; font-weight:500;">Batch summary · ready to submit</div>
+              <div class="row"><span>Medicaid waiver (state EVV)</span><span class="v">$22,840</span></div>
+              <div class="row"><span>Medicare home health (CMS-1500)</span><span class="v">$14,210</span></div>
+              <div class="row"><span>Private pay invoices</span><span class="v">$8,475</span></div>
+              <div class="row"><span>LTC insurance claims</span><span class="v">$2,790</span></div>
+              <div class="row total"><span>Total · 4 batches</span><span class="v">$48,315</span></div>
+            </div>
+
+            <div class="card" style="margin-bottom:0;">
+              <div class="label" style="margin-bottom:10px;">→ Denial detail · 3 open</div>
+              <div style="display:flex; flex-direction:column; gap:9px;">
+                <div style="padding:9px 11px; background:var(--rust-soft); border-left:3px solid var(--rust); border-radius:0 6px 6px 0; font-size:12.5px;">
+                  <div style="font-weight:600;">Eleanor R. · 5/27 visit</div>
+                  <div style="color:var(--muted); margin-top:1px;">Code 16 · EVV time mismatch · GPS drift 8min</div>
+                  <div style="margin-top:3px;"><button class="btn sm">Auto-correct + resubmit</button></div>
+                </div>
+                <div style="padding:9px 11px; background:var(--amber-soft); border-left:3px solid var(--amber); border-radius:0 6px 6px 0; font-size:12.5px;">
+                  <div style="font-weight:600;">Robert L. · 5/30 wound care</div>
+                  <div style="color:var(--muted); margin-top:1px;">Code 197 · prior auth missing · 60-day recert</div>
+                  <div style="margin-top:3px;"><button class="btn sm">Request recert</button></div>
+                </div>
+                <div style="padding:9px 11px; background:var(--amber-soft); border-left:3px solid var(--amber); border-radius:0 6px 6px 0; font-size:12.5px;">
+                  <div style="font-weight:600;">Margaret W. · 6/2 visit</div>
+                  <div style="color:var(--muted); margin-top:1px;">Code 96 · task documentation incomplete</div>
+                  <div style="margin-top:3px;"><button class="btn sm">Add narrative + resubmit</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" style="padding:0; margin-bottom:16px;">
+              <div style="padding:13px 16px; border-bottom:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:9.5px; letter-spacing:1.6px; text-transform:uppercase; color:var(--muted); font-weight:500;">Recent claim activity</div>
+              <div class="bill-row"><span class="dt">Jun 9</span><div><div class="nm">Medicaid waiver · batch 142</div><div style="font-size:11px; color:var(--muted);">38 visits · 7 patients</div></div><span class="amt">$4,310</span><span class="stat"><span class="pill green dot">Paid</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 8</span><div><div class="nm">Medicare HH · CMS-1500</div><div style="font-size:11px; color:var(--muted);">4 patients · 60-day episode</div></div><span class="amt">$8,920</span><span class="stat"><span class="pill blue dot">Submitted</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 7</span><div><div class="nm">Private invoice #1438</div><div style="font-size:11px; color:var(--muted);">Beatrice Klein · 47 hrs</div></div><span class="amt">$1,645</span><span class="stat"><span class="pill green dot">Paid</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 6</span><div><div class="nm">Medicaid waiver · batch 141</div><div style="font-size:11px; color:var(--muted);">42 visits · 9 patients</div></div><span class="amt">$5,180</span><span class="stat"><span class="pill green dot">Paid</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 5</span><div><div class="nm">LTC insurance · Met</div><div style="font-size:11px; color:var(--muted);">Harold S. · 84 hrs</div></div><span class="amt">$2,940</span><span class="stat"><span class="pill amber dot">Pending</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 3</span><div><div class="nm">Private invoice #1437</div><div style="font-size:11px; color:var(--muted);">Margaret W. · 28 hrs</div></div><span class="amt">$980</span><span class="stat"><span class="pill green dot">Paid</span></span><span></span></div>
+              <div class="bill-row"><span class="dt">Jun 1</span><div><div class="nm">Medicare HH · CMS-1500</div><div style="font-size:11px; color:var(--muted);">Robert L. · post-op episode</div></div><span class="amt">$5,290</span><span class="stat"><span class="pill rust dot">Denied · fixed</span></span><span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── DEMO BANNER ─────────────────────────────────────── -->
+      <div class="demo-banner">
+        <div class="mono">→ Heisenbug · Home Health Care cockpit · interactive demo</div>
+        <a href="https://heisenbug.app/#/home-health">Back to product page →</a>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// Tab nav
+const buttons = document.querySelectorAll('.nav-btn');
+const panels = document.querySelectorAll('.panel');
+const titles = {
+  schedule:  ["Today's schedule", "12 caregivers · 47 patients · 7 unstaffed"],
+  evv:       ["EVV check-in", "21st Century Cures Act compliant · live sync"],
+  patients:  ["Care plans", "47 active patients · 12 with skilled care · 35 non-medical"],
+  family:    ["Family view + messaging", "HIPAA-compliant · 38 family contacts opted in"],
+  compliance:["Compliance tracker", "12 caregivers · 10 full compliance · 2 expiring < 30d"],
+  billing:   ["Billing batch", "427 verified visits · $48.3k pending · 3 open denials"]
+};
+buttons.forEach(b => b.addEventListener('click', () => {
+  const p = b.dataset.panel;
+  buttons.forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  panels.forEach(x => x.classList.toggle('active', x.dataset.panel === p));
+  const t = titles[p];
+  if (t) {
+    document.getElementById('topbar-title').textContent = t[0];
+    document.getElementById('topbar-crumb').textContent = t[1];
+  }
+  window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+}));
+
+// Task check toggle in EVV panel
+document.querySelectorAll('.task').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('done'));
+});
+
+// Patient list selection
+document.querySelectorAll('.pt-list .pt').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.pt-list .pt').forEach(x => x.classList.remove('sel'));
+    p.classList.add('sel');
+  });
+});
+
+// Open-slot click (simulate assignment)
+document.querySelectorAll('.visit.open').forEach(v => {
+  v.addEventListener('click', () => {
+    v.classList.remove('open');
+    v.innerHTML = '<div class="vtime">' + v.textContent.match(/\d+:\d+\w/)[0] + ' · 60m</div><div class="vpt">Auto-assigned</div><div class="vtag">Match by certification ✓</div>';
+  });
+});
+</script>
+
+</body>
+</html>
