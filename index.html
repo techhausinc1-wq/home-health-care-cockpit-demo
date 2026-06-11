@@ -286,6 +286,104 @@ html, body {
 .bill-summary .row.total { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 11px; font-weight: 600; font-size: 14px; }
 .bill-summary .row .v { font-family: 'Fraunces', serif; font-weight: 500; }
 
+/* ── intake panel (kanban) ──────────────────────────────────────── */
+.kanban { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.kcol { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 0; box-shadow: var(--shadow); display: flex; flex-direction: column; min-height: 380px; }
+.kcol .kh { padding: 11px 13px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; background: #f4eed8; border-radius: 10px 10px 0 0; }
+.kcol .kh .nm { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.kcol .kh .ct { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 500; }
+.kcol.hot .kh { background: var(--rust-soft); }
+.kcol.hot .kh .nm { color: var(--rust); }
+.kcol .kbody { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.kcard { background: white; border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; cursor: pointer; transition: all 100ms; }
+.kcard:hover { background: #fcf9ec; border-color: var(--amber); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(15,31,15,0.08); }
+.kcard .nm { font-weight: 600; font-size: 13px; }
+.kcard .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.kcard .source { display: inline-flex; align-items: center; gap: 4px; padding: 1px 6px; background: var(--blue-soft); color: var(--blue); border-radius: 8px; font-size: 10px; font-weight: 600; margin-top: 6px; }
+.kcard .source.physician { background: var(--green-soft); color: var(--green); }
+.kcard .source.self { background: #f0e8d8; color: var(--amber); }
+.kcard .days { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); float: right; letter-spacing: 0.4px; }
+.kcard .insurance { font-size: 10.5px; color: var(--ink-2); margin-top: 5px; padding-top: 5px; border-top: 1px dashed var(--line); }
+
+.intake-side { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+.referral-sources, .intake-actions { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+.referral-sources h4, .intake-actions h4 { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 11px; }
+.src-row { display: grid; grid-template-columns: 1fr 80px 50px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px dashed var(--line); font-size: 12.5px; }
+.src-row:last-child { border-bottom: none; }
+.src-row .bar { background: var(--line); border-radius: 3px; height: 6px; position: relative; overflow: hidden; }
+.src-row .bar div { background: var(--green); height: 100%; border-radius: 3px; }
+.src-row .ct { font-family: 'JetBrains Mono', monospace; font-weight: 600; text-align: right; font-size: 11.5px; }
+.action-item { display: flex; align-items: center; gap: 10px; padding: 9px 11px; background: var(--amber-soft); border-radius: 7px; margin-bottom: 6px; font-size: 12.5px; }
+.action-item.urgent { background: var(--rust-soft); }
+.action-item .ic { width: 22px; text-align: center; font-size: 14px; }
+.action-item .nm { flex: 1; font-weight: 600; }
+.action-item .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+
+/* ── caregiver app panel ────────────────────────────────────────── */
+.cgapp-grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; }
+.cgapp-side h3 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 500; margin-bottom: 6px; }
+.cgapp-side .info { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.cgapp-block { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.cgapp-block h4 { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.cg-feature { display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+.cg-feature:last-child { border: none; }
+.cg-feature .ic { width: 32px; height: 32px; background: var(--green-soft); color: var(--green); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+.cg-feature .nm { font-weight: 600; font-size: 13px; }
+.cg-feature .desc { font-size: 12px; color: var(--muted); margin-top: 1px; line-height: 1.4; }
+
+.cgapp-screen-tab { display: flex; gap: 4px; margin-bottom: 10px; }
+.cgapp-screen-tab button { background: transparent; border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; font-weight: 600; }
+.cgapp-screen-tab button.active { background: var(--green); border-color: var(--green); color: white; }
+
+.cg-visit-card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; margin-bottom: 6px; }
+.cg-visit-card.done { opacity: 0.7; background: #f6f0e0; }
+.cg-visit-card.now { background: var(--blue-soft); border-color: #a8c4d8; border-width: 1.5px; }
+.cg-visit-card .top { display: flex; justify-content: space-between; align-items: baseline; }
+.cg-visit-card .tm { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+.cg-visit-card .pn { font-weight: 600; font-size: 13px; margin-top: 1px; }
+.cg-visit-card .ad { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.cg-visit-card .st { font-size: 11px; padding: 2px 7px; border-radius: 8px; font-weight: 600; }
+.cg-visit-card.done .st { background: var(--green-soft); color: var(--green); }
+.cg-visit-card.now .st { background: var(--blue); color: white; }
+
+.cg-msg { background: #f4f4f0; border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; font-size: 12.5px; max-width: 84%; }
+.cg-msg.in { background: var(--blue-soft); }
+.cg-msg.out { background: var(--green-soft); margin-left: auto; }
+.cg-msg .from { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); letter-spacing: 0.4px; margin-bottom: 1px; font-weight: 600; }
+
+/* ── quality + outcomes panel ───────────────────────────────────── */
+.star-row { display: flex; align-items: center; gap: 6px; }
+.star { color: var(--amber); font-size: 18px; }
+.star.empty { color: var(--line-2); }
+.half-star { color: var(--amber); }
+
+.outcomes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+.outcomes-card { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+.outcomes-card h4 { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-bottom: 4px; }
+.outcomes-card .display { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 500; letter-spacing: -0.5px; }
+.outcomes-card .ctx { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.outcomes-card .delta { font-size: 11.5px; color: var(--green); font-weight: 600; margin-top: 4px; }
+.outcomes-card .delta.dn { color: var(--rust); }
+
+.measures { display: grid; gap: 9px; }
+.measure { display: grid; grid-template-columns: 1fr 60px 80px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 12.5px; }
+.measure:last-child { border: none; }
+.measure .bar { background: var(--line); border-radius: 3px; height: 7px; position: relative; overflow: hidden; }
+.measure .bar div { height: 100%; border-radius: 3px; }
+.measure .pct { font-family: 'Fraunces', serif; font-weight: 500; text-align: right; font-size: 14px; }
+
+.risk-pt { background: var(--rust-soft); border-left: 3px solid var(--rust); border-radius: 0 7px 7px 0; padding: 9px 13px; margin-bottom: 7px; font-size: 12.5px; }
+.risk-pt .nm { font-weight: 600; }
+.risk-pt .why { color: var(--muted); margin-top: 2px; font-size: 11.5px; }
+.risk-pt .actions { margin-top: 6px; display: flex; gap: 6px; }
+
+.trend-svg { width: 100%; height: 120px; display: block; }
+
+@media (max-width: 1000px) {
+  .kanban { grid-template-columns: 1fr; }
+  .intake-side, .outcomes-grid, .cgapp-grid { grid-template-columns: 1fr; }
+}
+
 /* ── footer banner ──────────────────────────────────────────────── */
 .demo-banner {
   background: linear-gradient(135deg, #0f1f0f 0%, #1a3a1a 100%);
@@ -323,15 +421,26 @@ html, body {
       <button class="nav-btn" data-panel="evv"><span class="ic">●</span>EVV check-in</button>
     </div>
 
+    <div class="nav-cat">Growth</div>
+    <div class="nav">
+      <button class="nav-btn" data-panel="intake"><span class="ic">→</span>Intake<span class="badge">5</span></button>
+    </div>
+
     <div class="nav-cat">Patients</div>
     <div class="nav">
       <button class="nav-btn" data-panel="patients"><span class="ic">◉</span>Care plans</button>
       <button class="nav-btn" data-panel="family"><span class="ic">✉</span>Family<span class="badge">3</span></button>
     </div>
 
+    <div class="nav-cat">Caregivers</div>
+    <div class="nav">
+      <button class="nav-btn" data-panel="cgapp"><span class="ic">▢</span>Caregiver app</button>
+    </div>
+
     <div class="nav-cat">Agency</div>
     <div class="nav">
       <button class="nav-btn" data-panel="compliance"><span class="ic">▲</span>Compliance<span class="badge">2</span></button>
+      <button class="nav-btn" data-panel="quality"><span class="ic">★</span>Quality</button>
       <button class="nav-btn" data-panel="billing"><span class="ic">$</span>Billing</button>
     </div>
 
@@ -826,6 +935,342 @@ html, body {
         </div>
       </div>
 
+      <!-- ─── INTAKE ──────────────────────────────────────────── -->
+      <div class="panel" data-panel="intake">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ New patient pipeline · referrals → admission</div>
+            <h2>Intake</h2>
+            <p class="sub">Hospital discharge planners, physicians, and family referrals enter the pipeline. The cockpit tracks every referral through pre-screen, intake visit, and admission. The agency's growth engine — usually run in a spreadsheet or a string of voicemails.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">This week</button>
+            <button class="btn primary">+ New referral</button>
+          </div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">New referrals · 7d</div><div class="num">23</div><div class="delta">+8 vs prior week</div></div>
+          <div class="kpi"><div class="label">In pipeline</div><div class="num">17</div><div class="delta">5 today, 7 this week</div></div>
+          <div class="kpi"><div class="label">Conversion rate</div><div class="num" style="color:var(--green);">78%</div><div class="delta">+6% MoM</div></div>
+          <div class="kpi"><div class="label">Avg days to admit</div><div class="num">4.2</div><div class="delta">target ≤5d</div></div>
+        </div>
+
+        <div class="kanban">
+          <div class="kcol hot">
+            <div class="kh"><span class="nm">New referrals</span><span class="ct">5</span></div>
+            <div class="kbody">
+              <div class="kcard"><span class="days">2h</span><div class="nm">Robert Hammond</div><div class="meta">78 · post-op hip · skilled HH</div><div><span class="source">Methodist Hosp</span></div><div class="insurance">Medicare HH · F2F pending</div></div>
+              <div class="kcard"><span class="days">5h</span><div class="nm">Donna Patel</div><div class="meta">71 · diabetic wound care</div><div><span class="source physician">Dr. Garcia</span></div><div class="insurance">Medicare HH · order signed</div></div>
+              <div class="kcard"><span class="days">today</span><div class="nm">George Yamamoto</div><div class="meta">84 · companion + bath assist</div><div><span class="source self">Family · self-refer</span></div><div class="insurance">Private pay · $32/hr</div></div>
+              <div class="kcard"><span class="days">today</span><div class="nm">Maria Sanchez</div><div class="meta">69 · CHF · medication mgmt</div><div><span class="source">Baptist Disch</span></div><div class="insurance">Medicaid waiver · STAR+PLUS</div></div>
+              <div class="kcard"><span class="days">today</span><div class="nm">William Foster</div><div class="meta">73 · post-stroke PT</div><div><span class="source physician">Dr. Mendez</span></div><div class="insurance">Medicare HH</div></div>
+            </div>
+          </div>
+
+          <div class="kcol">
+            <div class="kh"><span class="nm">Pre-screening</span><span class="ct">4</span></div>
+            <div class="kbody">
+              <div class="kcard"><span class="days">1d</span><div class="nm">Anita Brooks</div><div class="meta">67 · oncology · palliative</div><div><span class="source">Methodist Onc</span></div><div class="insurance">Medicare HH · auth pending</div></div>
+              <div class="kcard"><span class="days">1d</span><div class="nm">Charles Lim</div><div class="meta">81 · falls risk · safety eval</div><div><span class="source physician">Dr. Carter</span></div><div class="insurance">Medicare HH</div></div>
+              <div class="kcard"><span class="days">2d</span><div class="nm">Dorothy Vance</div><div class="meta">74 · bath assist · meal prep</div><div><span class="source self">Family</span></div><div class="insurance">LTC insurance · 84 hrs</div></div>
+              <div class="kcard"><span class="days">2d</span><div class="nm">Stephen Kowalski</div><div class="meta">88 · post-op knee · PT</div><div><span class="source">San Antonio Reg</span></div><div class="insurance">Medicare HH</div></div>
+            </div>
+          </div>
+
+          <div class="kcol">
+            <div class="kh"><span class="nm">Intake visit scheduled</span><span class="ct">4</span></div>
+            <div class="kbody">
+              <div class="kcard"><span class="days">tmrw</span><div class="nm">Janet Olsson</div><div class="meta">76 · CHF + COPD</div><div><span class="source">Methodist Hosp</span></div><div class="insurance">Visit · RN Thompson · 10am</div></div>
+              <div class="kcard"><span class="days">tmrw</span><div class="nm">Lawrence Brooks</div><div class="meta">82 · wound · stage 3</div><div><span class="source physician">Dr. Wong</span></div><div class="insurance">Visit · RN Chen · 2pm</div></div>
+              <div class="kcard"><span class="days">Fri</span><div class="nm">Margaret Brennan</div><div class="meta">77 · diabetes mgmt</div><div><span class="source">Baptist</span></div><div class="insurance">Visit · RN Thompson · Fri 11am</div></div>
+              <div class="kcard"><span class="days">Fri</span><div class="nm">Edward Chen</div><div class="meta">85 · companion + meds</div><div><span class="source self">Self</span></div><div class="insurance">Visit · PCA lead · Fri 3pm</div></div>
+            </div>
+          </div>
+
+          <div class="kcol">
+            <div class="kh"><span class="nm">Admission ready</span><span class="ct">3</span></div>
+            <div class="kbody">
+              <div class="kcard"><span class="days">today</span><div class="nm">Lillian Hayes</div><div class="meta">79 · PCA · 5x/wk</div><div><span class="source">Methodist</span></div><div class="insurance">OASIS done · care plan ready</div></div>
+              <div class="kcard"><span class="days">today</span><div class="nm">Albert Greer</div><div class="meta">71 · wound care · 3x/wk</div><div><span class="source physician">Dr. Garcia</span></div><div class="insurance">First visit tomorrow 9am</div></div>
+              <div class="kcard"><span class="days">today</span><div class="nm">Frances Polanski</div><div class="meta">83 · PT + bath assist</div><div><span class="source">San Antonio Reg</span></div><div class="insurance">First visit tomorrow 11am</div></div>
+            </div>
+          </div>
+
+          <div class="kcol">
+            <div class="kh"><span class="nm">Active · admitted 7d</span><span class="ct">11</span></div>
+            <div class="kbody">
+              <div style="font-size:12px; color:var(--muted); padding:10px 0;">Recent admissions flow into the patient roster. View in Care plans →</div>
+              <div class="kcard" style="background:var(--green-soft); border-color:#c5d4a0;"><span class="days">Mon</span><div class="nm">Helen Tao</div><div class="meta">Active · PCA · 5x/wk</div></div>
+              <div class="kcard" style="background:var(--green-soft); border-color:#c5d4a0;"><span class="days">Mon</span><div class="nm">Lucia Esparza</div><div class="meta">Active · companion</div></div>
+              <div class="kcard" style="background:var(--green-soft); border-color:#c5d4a0;"><span class="days">Sun</span><div class="nm">Beatrice Okonkwo</div><div class="meta">Active · post-op vitals</div></div>
+              <div style="text-align:center; padding:6px; font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:0.5px;">+ 8 more →</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="intake-side">
+          <div class="referral-sources">
+            <h4>Top referral sources · 30d</h4>
+            <div class="src-row"><span><strong>Methodist Hospital</strong><br><span style="font-size:10.5px;color:var(--muted);">Discharge planner: Lisa Park</span></span><div class="bar"><div style="width:88%;"></div></div><span class="ct">14</span></div>
+            <div class="src-row"><span><strong>Dr. Maria Garcia · primary care</strong><br><span style="font-size:10.5px;color:var(--muted);">Westover Hills office</span></span><div class="bar"><div style="width:62%;"></div></div><span class="ct">9</span></div>
+            <div class="src-row"><span><strong>Baptist Health · discharge</strong><br><span style="font-size:10.5px;color:var(--muted);">DC planner: Maria Lopez</span></span><div class="bar"><div style="width:50%;"></div></div><span class="ct">7</span></div>
+            <div class="src-row"><span><strong>Family / self-referral</strong><br><span style="font-size:10.5px;color:var(--muted);">Direct call + website form</span></span><div class="bar"><div style="width:38%;"></div></div><span class="ct">6</span></div>
+            <div class="src-row"><span><strong>Dr. Carter · cardiology</strong><br><span style="font-size:10.5px;color:var(--muted);">North Central</span></span><div class="bar"><div style="width:28%;"></div></div><span class="ct">4</span></div>
+          </div>
+          <div class="intake-actions">
+            <h4>Needs your attention</h4>
+            <div class="action-item urgent"><span class="ic">⚠</span><div style="flex:1;"><div class="nm">Robert Hammond · F2F encounter pending</div><div class="meta">Medicare HH cannot start without it. Day 2 of 30.</div></div></div>
+            <div class="action-item urgent"><span class="ic">⚠</span><div style="flex:1;"><div class="nm">Anita Brooks · auth pending Methodist Onc</div><div class="meta">Day 3 · contact Lisa Park to expedite</div></div></div>
+            <div class="action-item"><span class="ic">○</span><div style="flex:1;"><div class="nm">Donna Patel · ready to schedule intake visit</div><div class="meta">Orders signed yesterday · RN slot Friday</div></div></div>
+            <div class="action-item"><span class="ic">○</span><div style="flex:1;"><div class="nm">George Yamamoto · private-pay quote sent</div><div class="meta">Awaiting family response · sent 9:15 AM</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CAREGIVER APP ──────────────────────────────────── -->
+      <div class="panel" data-panel="cgapp">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ The caregiver's phone view</div>
+            <h2>Caregiver app</h2>
+            <p class="sub">The 80% of the cockpit that lives on the caregiver's phone. Today's visits, in-app messaging with the office, time-off requests, pay stubs, license expiry alerts. Caregiver retention is the #1 problem in home health and software that respects their day is the cheapest fix.</p>
+          </div>
+        </div>
+
+        <div class="cgapp-grid">
+          <div>
+            <div class="cgapp-screen-tab">
+              <button class="cgs-btn active" data-screen="today">Today</button>
+              <button class="cgs-btn" data-screen="msgs">Messages</button>
+              <button class="cgs-btn" data-screen="me">My account</button>
+            </div>
+
+            <div class="phone">
+              <div class="notch"></div>
+              <div class="phone-screen" style="min-height: 580px;">
+                <div class="phone-top">
+                  <span>7:42 AM</span>
+                  <span>● ● ● ● ●</span>
+                </div>
+
+                <!-- TODAY screen -->
+                <div class="cgs-view active" data-screen="today">
+                  <div class="phone-h">Hey Maria 👋</div>
+                  <div class="phone-sub">5 visits today · 4.5 hrs · 14 mi</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Up next · in 18 min</div>
+
+                  <div class="cg-visit-card now">
+                    <div class="top"><span class="tm">9:15a · 90m</span><span class="st">Drive now</span></div>
+                    <div class="pn">Harold Steinberg</div>
+                    <div class="ad">218 Loma Vista · 3.2mi · 9 min drive</div>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Earlier today</div>
+
+                  <div class="cg-visit-card done">
+                    <div class="top"><span class="tm">7:30a · 60m</span><span class="st">✓ Done</span></div>
+                    <div class="pn">Eleanor Rodriguez</div>
+                    <div class="ad">412 W Oak St · all 5 tasks complete</div>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Rest of the day</div>
+
+                  <div class="cg-visit-card">
+                    <div class="top"><span class="tm">11:30a · 60m</span></div>
+                    <div class="pn">Beatrice Klein</div>
+                    <div class="ad">907 Mulberry Ln · 2.1mi from Harold</div>
+                  </div>
+                  <div class="cg-visit-card">
+                    <div class="top"><span class="tm">1:30p · 45m</span></div>
+                    <div class="pn">Frank Daley</div>
+                    <div class="ad">3204 Cedar Park · ⚠ traffic risk</div>
+                  </div>
+                  <div class="cg-visit-card">
+                    <div class="top"><span class="tm">3:00p · 90m</span></div>
+                    <div class="pn">Margaret Wong</div>
+                    <div class="ad">521 Elm Ct · last visit of day</div>
+                  </div>
+                </div>
+
+                <!-- MESSAGES screen -->
+                <div class="cgs-view" data-screen="msgs" style="display:none;">
+                  <div class="phone-h">Messages</div>
+                  <div class="phone-sub">3 active threads</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Office · Jennifer Thompson (RN)</div>
+
+                  <div class="cg-msg in"><div class="from">RN Thompson · 7:30 AM</div>Hi Maria, can you flag Eleanor's BP today? It crept up Friday and I want to track this week.</div>
+                  <div class="cg-msg out"><div class="from">You · 7:34 AM</div>Will do. I'll text you right after the visit if anything looks off.</div>
+                  <div class="cg-msg in"><div class="from">RN Thompson · 7:35 AM</div>Thanks! 🙏</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Office · scheduling</div>
+
+                  <div class="cg-msg in"><div class="from">Rosa (admin) · yesterday</div>Hey, would you be willing to pick up Edward C's 2pm Friday if Carlos is out? It's the bilingual companion visit.</div>
+                  <div class="cg-msg out"><div class="from">You · yesterday</div>Yes I can do it.</div>
+                </div>
+
+                <!-- MY ACCOUNT screen -->
+                <div class="cgs-view" data-screen="me" style="display:none;">
+                  <div class="phone-h">My account</div>
+                  <div class="phone-sub">Maria Alvarez · PCA · started 2024-03</div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">This week</div>
+                  <div style="background:var(--green-soft); border:1px solid #c5d4a0; padding:10px 12px; border-radius:8px; margin-bottom:8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--muted);"><span>Hours worked</span><span>Est. pay</span></div>
+                    <div style="display:flex; justify-content:space-between; font-family:'Fraunces',serif; font-size:20px; font-weight:500; margin-top:1px;"><span>27.5</span><span>$687.50</span></div>
+                  </div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">My certifications</div>
+                  <div style="background:white; border:1px solid var(--line); padding:8px 11px; border-radius:7px; margin-bottom:5px; display:flex; justify-content:space-between; font-size:12.5px;"><span><strong>State PCA license</strong></span><span style="color:var(--green); font-family:'JetBrains Mono',monospace; font-size:11px;">2027-08 ✓</span></div>
+                  <div style="background:white; border:1px solid var(--line); padding:8px 11px; border-radius:7px; margin-bottom:5px; display:flex; justify-content:space-between; font-size:12.5px;"><span><strong>CPR / first aid</strong></span><span style="color:var(--green); font-family:'JetBrains Mono',monospace; font-size:11px;">2027-03 ✓</span></div>
+                  <div style="background:white; border:1px solid var(--line); padding:8px 11px; border-radius:7px; margin-bottom:5px; display:flex; justify-content:space-between; font-size:12.5px;"><span><strong>TB test</strong></span><span style="color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:11px;">2026-11 · 4mo</span></div>
+                  <div style="background:white; border:1px solid var(--line); padding:8px 11px; border-radius:7px; margin-bottom:5px; display:flex; justify-content:space-between; font-size:12.5px;"><span><strong>Background check</strong></span><span style="color:var(--green); font-family:'JetBrains Mono',monospace; font-size:11px;">2027-01 ✓</span></div>
+
+                  <div style="font-family:'JetBrains Mono',monospace; font-size:9.5px; color:var(--muted); letter-spacing:1.6px; text-transform:uppercase; margin: 14px 0 6px; font-weight: 600;">Quick actions</div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                    <button class="btn sm" style="padding:10px;">Request time off</button>
+                    <button class="btn sm" style="padding:10px;">View pay stub</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="cgapp-side">
+            <h3>Why the caregiver experience matters</h3>
+            <p class="info">Home health turnover runs 60% annually. Every replacement costs ~$2,500 in recruiting + training. Software that respects the caregiver's day is the cheapest retention lever available — cheaper than raises. The features below are the ones caregivers tell us actually move the needle.</p>
+
+            <div class="cgapp-block">
+              <h4>Built into the caregiver app</h4>
+              <div class="cg-feature"><span class="ic">▦</span><div><div class="nm">Today's schedule with drive guidance</div><div class="desc">Visits in time order. Tap the next visit → opens Apple/Google Maps with one tap. No copy-pasting addresses.</div></div></div>
+              <div class="cg-feature"><span class="ic">●</span><div><div class="nm">One-tap EVV check-in</div><div class="desc">GPS auto-verified at the patient's location. No separate state EVV app to fight with.</div></div></div>
+              <div class="cg-feature"><span class="ic">✉</span><div><div class="nm">In-app messaging</div><div class="desc">Direct line to RN supervisor and office scheduling. Caregivers' real questions get real answers without playing phone tag.</div></div></div>
+              <div class="cg-feature"><span class="ic">$</span><div><div class="nm">Live pay tracking</div><div class="desc">Hours-this-week and estimated pay update after every visit. The #1 retention question: "did I get paid for my hours?" — answered before they ask.</div></div></div>
+              <div class="cg-feature"><span class="ic">▲</span><div><div class="nm">My licenses + expiry alerts</div><div class="desc">Caregiver sees their own certifications and gets push reminders 60 / 30 / 7 days before expiry. Office stops chasing.</div></div></div>
+              <div class="cg-feature"><span class="ic">→</span><div><div class="nm">Time-off requests + shift swap</div><div class="desc">Request PTO, see open shifts you can pick up, swap with another caregiver — all without calling the office.</div></div></div>
+            </div>
+
+            <div class="cgapp-block" style="background:var(--green-deep); color:#d8e0d4;">
+              <h4 style="color:var(--green-bright);">Engine note · cross-vertical</h4>
+              <p style="font-size:12.5px; line-height:1.5; color:#b8c0b4;">This same caregiver-on-the-phone pattern powers the HVAC tech app, plumbing tech app, pool tech app, pet sitter app, landscape crew app — every field service vertical in the catalog. Different industry vocabulary, same architecture: schedule + GPS verify + message + pay + license expiry. Build it once, ship it to 10+ products.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── QUALITY + OUTCOMES ─────────────────────────────── -->
+      <div class="panel" data-panel="quality">
+        <div class="panel-head">
+          <div>
+            <div class="label">→ CMS Star Rating · HHCAHPS · ACH rate · OASIS outcomes</div>
+            <h2>Quality + outcomes</h2>
+            <p class="sub">CMS Star Rating drives Medicare Advantage referrals. HHCAHPS satisfaction shows up on Care Compare. ACH (Acute Care Hospitalization) is the #1 outcome that referral sources track. This is the dashboard the agency owner watches when not putting out today's fires.</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn">12-month view</button>
+            <button class="btn primary">Submit CASPER</button>
+          </div>
+        </div>
+
+        <div class="outcomes-grid">
+          <div class="outcomes-card">
+            <h4>CMS Star Rating · Quality of Patient Care</h4>
+            <div style="display:flex; align-items:baseline; gap:12px; margin-top:6px;">
+              <div class="display">4.5</div>
+              <div class="star-row"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="half-star">⯨</span></div>
+            </div>
+            <div class="ctx">Texas state average: 3.5 · National: 3.0</div>
+            <div class="delta">+0.5 stars over 12 mo</div>
+          </div>
+
+          <div class="outcomes-card">
+            <h4>HHCAHPS · Patient Satisfaction</h4>
+            <div class="display" style="color:var(--green);">89<span style="font-size:18px; color:var(--muted);">%</span></div>
+            <div class="ctx">"Would definitely recommend" — top-box score · last 4 quarters</div>
+            <div class="delta">+4 pts vs FY24</div>
+          </div>
+
+          <div class="outcomes-card">
+            <h4>ACH · Acute Care Hospitalization rate</h4>
+            <div class="display" style="color:var(--green);">12.4<span style="font-size:18px; color:var(--muted);">%</span></div>
+            <div class="ctx">Hospitalization within 60 days of admission. National benchmark: 15.5%</div>
+            <div class="delta">-2.1 pts YoY · below national avg</div>
+          </div>
+
+          <div class="outcomes-card">
+            <h4>Improvement in ambulation</h4>
+            <div class="display" style="color:var(--green);">71<span style="font-size:18px; color:var(--muted);">%</span></div>
+            <div class="ctx">OASIS M1860 outcome · % patients showing improvement</div>
+            <div class="delta">+6 pts vs national avg</div>
+          </div>
+        </div>
+
+        <div class="outcomes-grid" style="margin-top:18px;">
+          <div class="outcomes-card">
+            <h4>Patient experience breakdown · HHCAHPS</h4>
+            <div class="measures" style="margin-top:11px;">
+              <div class="measure"><span><strong>Care of patients</strong> · how well caregivers treat me</span><div class="bar"><div style="width:94%; background:var(--green);"></div></div><span class="pct">94%</span></div>
+              <div class="measure"><span><strong>Communication</strong> · staff kept me informed</span><div class="bar"><div style="width:88%; background:var(--green);"></div></div><span class="pct">88%</span></div>
+              <div class="measure"><span><strong>Medications</strong> · provider discussed side effects</span><div class="bar"><div style="width:84%; background:var(--green);"></div></div><span class="pct">84%</span></div>
+              <div class="measure"><span><strong>Pain</strong> · provider treated pain</span><div class="bar"><div style="width:91%; background:var(--green);"></div></div><span class="pct">91%</span></div>
+              <div class="measure"><span><strong>Would recommend</strong> · overall</span><div class="bar"><div style="width:89%; background:var(--green);"></div></div><span class="pct">89%</span></div>
+              <div class="measure"><span><strong>Discharge info</strong> · what to do for problems</span><div class="bar"><div style="width:76%; background:var(--amber);"></div></div><span class="pct">76%</span></div>
+            </div>
+          </div>
+
+          <div class="outcomes-card">
+            <h4>ACH rate · 12-month trend</h4>
+            <svg viewBox="0 0 400 120" class="trend-svg" style="margin-top:10px;">
+              <defs>
+                <linearGradient id="achGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1f6b3a" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#1f6b3a" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- benchmark line (national avg 15.5%) -->
+              <line x1="20" y1="48" x2="380" y2="48" stroke="#c0532b" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
+              <text x="382" y="51" font-family="JetBrains Mono" font-size="9" fill="#c0532b">Nat'l 15.5%</text>
+              <!-- area -->
+              <path d="M 20,30 L 60,38 L 100,32 L 140,52 L 180,46 L 220,58 L 260,62 L 300,70 L 340,76 L 380,82 L 380,108 L 20,108 Z" fill="url(#achGrad)"/>
+              <!-- line -->
+              <polyline points="20,30 60,38 100,32 140,52 180,46 220,58 260,62 300,70 340,76 380,82" fill="none" stroke="#1f6b3a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- dots -->
+              <g fill="#1f6b3a"><circle cx="20" cy="30" r="3"/><circle cx="60" cy="38" r="3"/><circle cx="100" cy="32" r="3"/><circle cx="140" cy="52" r="3"/><circle cx="180" cy="46" r="3"/><circle cx="220" cy="58" r="3"/><circle cx="260" cy="62" r="3"/><circle cx="300" cy="70" r="3"/><circle cx="340" cy="76" r="3"/><circle cx="380" cy="82" r="3.5"/></g>
+              <!-- labels -->
+              <g font-family="JetBrains Mono" font-size="9" fill="#7a7068">
+                <text x="20" y="118">Jul</text><text x="100" y="118">Sep</text><text x="180" y="118">Nov</text><text x="260" y="118">Jan</text><text x="340" y="118">May</text>
+              </g>
+              <!-- right value -->
+              <text x="385" y="85" font-family="Fraunces" font-size="13" font-weight="600" fill="#1f6b3a">12.4%</text>
+            </svg>
+            <div style="font-size:11.5px; color:var(--muted); margin-top:6px;">Down from 14.6% a year ago. The RN supervisory visit cadence change in Q1 is showing in the numbers.</div>
+          </div>
+        </div>
+
+        <div class="outcomes-card" style="margin-top:16px;">
+          <h4>Patients at high ACH risk · 3 flagged this week</h4>
+          <div style="margin-top:11px;">
+            <div class="risk-pt">
+              <div class="nm">Edward Cooke · 67 · CHF + diabetes</div>
+              <div class="why">Refused last 2 visits · BP trending up · medication compliance flagged by Carlos W. on Mon</div>
+              <div class="actions"><button class="btn sm primary">Schedule RN visit</button><button class="btn sm">Message family</button></div>
+            </div>
+            <div class="risk-pt">
+              <div class="nm">Doris Mitchell · 84 · post-fall</div>
+              <div class="why">INR out of range Friday · second fall reported by family · OT consult overdue</div>
+              <div class="actions"><button class="btn sm primary">OT eval today</button><button class="btn sm">Notify Dr. Carter</button></div>
+            </div>
+            <div class="risk-pt">
+              <div class="nm">Harold Steinberg · 79 · post-CHF</div>
+              <div class="why">Weight up 4 lbs in 3 days · diuretic compliance unclear · RN flagged Wed</div>
+              <div class="actions"><button class="btn sm primary">Same-day RN visit</button><button class="btn sm">Reach Dr. Garcia</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ─── DEMO BANNER ─────────────────────────────────────── -->
       <div class="demo-banner">
         <div class="mono">→ Heisenbug · Home Health Care cockpit · interactive demo</div>
@@ -843,9 +1288,12 @@ const panels = document.querySelectorAll('.panel');
 const titles = {
   schedule:  ["Today's schedule", "12 caregivers · 47 patients · 7 unstaffed"],
   evv:       ["EVV check-in", "21st Century Cures Act compliant · live sync"],
+  intake:    ["Intake pipeline", "23 referrals · 78% convert · 4.2d avg admit"],
   patients:  ["Care plans", "47 active patients · 12 with skilled care · 35 non-medical"],
   family:    ["Family view + messaging", "HIPAA-compliant · 38 family contacts opted in"],
+  cgapp:     ["Caregiver app", "What every caregiver sees on the phone"],
   compliance:["Compliance tracker", "12 caregivers · 10 full compliance · 2 expiring < 30d"],
+  quality:   ["Quality + outcomes", "CMS 4.5★ · HHCAHPS 89% · ACH 12.4%"],
   billing:   ["Billing batch", "427 verified visits · $48.3k pending · 3 open denials"]
 };
 buttons.forEach(b => b.addEventListener('click', () => {
@@ -922,6 +1370,17 @@ if (autofillBtn) {
     setTimeout(() => { autofillBtn.disabled = false; autofillBtn.textContent = "Auto-fill 7 open visits"; }, 2200);
   });
 }
+
+// Caregiver-app screen tabs (today / messages / my account)
+document.querySelectorAll('.cgs-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    const s = b.dataset.screen;
+    document.querySelectorAll('.cgs-btn').forEach(x => x.classList.toggle('active', x === b));
+    document.querySelectorAll('.cgs-view').forEach(v => {
+      v.style.display = v.dataset.screen === s ? 'block' : 'none';
+    });
+  });
+});
 
 // Manual click on a single open slot still works
 document.addEventListener('click', e => {
