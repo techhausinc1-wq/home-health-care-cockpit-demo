@@ -132,6 +132,12 @@ html, body {
 .btn.ghost:hover { background: var(--paper-2); color: var(--ink); }
 
 /* ── schedule panel ──────────────────────────────────────────────── */
+.view-toggle { display: inline-flex; background: var(--paper-2); border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.view-toggle button { background: transparent; border: none; padding: 6px 14px; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; letter-spacing: 0.3px; }
+.view-toggle button.active { background: var(--green); color: white; }
+.schedule-view { display: none; }
+.schedule-view.active { display: block; }
+
 .schedule-grid { display: grid; grid-template-columns: 180px 1fr; gap: 0; background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
 .schedule-grid .col-head { background: #f4eed8; border-bottom: 1px solid var(--line); padding: 9px 12px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
 .schedule-grid .cg-row { display: contents; }
@@ -140,16 +146,42 @@ html, body {
 .cg-cell .av { width: 30px; height: 30px; border-radius: 50%; background: var(--blue); color: white; display: inline-flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 600; }
 .cg-cell .nm { font-weight: 600; font-size: 13px; }
 .cg-cell .role { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.8px; text-transform: uppercase; }
-.visits-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 9px 12px; }
-.visit { background: var(--green-soft); border: 1px solid #d3dfb8; border-radius: 6px; padding: 6px 9px; font-size: 11.5px; cursor: pointer; transition: all 100ms; min-width: 100px; }
-.visit:hover { background: #dde6c2; }
+.cg-cell .util { font-size: 10px; color: var(--muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; }
+.visits-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 9px 12px; align-items: stretch; }
+.visit { background: var(--green-soft); border: 1px solid #d3dfb8; border-radius: 6px; padding: 7px 10px; font-size: 11.5px; cursor: pointer; transition: all 100ms; min-width: 128px; max-width: 148px; position: relative; }
+.visit:hover { background: #dde6c2; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(15,31,15,0.08); }
 .visit.amber { background: var(--amber-soft); border-color: #e8d090; }
 .visit.rust { background: var(--rust-soft); border-color: #e8b890; }
+.visit.inprogress { background: var(--blue-soft); border-color: #a8c4d8; }
+.visit.inprogress::before { content: ''; position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 4px rgba(31,91,136,0.12); animation: pulse 1.6s infinite; }
+.visit.done { background: #f4f0e0; border-color: #d8d0b0; opacity: 0.78; }
+.visit.done::before { content: '✓'; position: absolute; top: 4px; right: 6px; font-size: 11px; color: var(--green); font-weight: 700; }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(31,91,136,0.12); } 50% { box-shadow: 0 0 0 6px rgba(31,91,136,0.02); } }
+.visit .vrow { display: flex; justify-content: space-between; align-items: baseline; }
 .visit .vtime { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.4px; }
-.visit .vpt { font-weight: 600; font-size: 12px; margin-top: 1px; }
-.visit .vtag { font-size: 9.5px; color: var(--muted); margin-top: 2px; }
-.visit.open { background: white; border: 1px dashed #d4cdb8; color: var(--muted); text-align: center; }
+.visit .vdrive { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); letter-spacing: 0.4px; }
+.visit .vpt { font-weight: 600; font-size: 12px; margin-top: 2px; line-height: 1.25; }
+.visit .vaddr { font-size: 10px; color: var(--muted); margin-top: 1px; }
+.visit .vtag { font-size: 9.5px; color: var(--ink-2); margin-top: 3px; padding-top: 3px; border-top: 1px dashed #c8d0b0; line-height: 1.3; }
+.visit.amber .vtag { border-color: #d8c890; }
+.visit.rust .vtag { border-color: #d8a890; }
+.visit.inprogress .vtag { border-color: #a8c4d8; }
+.visit.open { background: white; border: 1px dashed #d4cdb8; color: var(--muted); text-align: center; display: flex; align-items: center; justify-content: center; min-height: 78px; }
 .visit.open:hover { border-color: var(--green); color: var(--green); background: var(--green-soft); }
+.visit.open.assigning { animation: fillIn 600ms forwards; }
+@keyframes fillIn { 0% { background: white; } 50% { background: var(--amber-soft); border-color: var(--amber); border-style: solid; color: var(--amber); } 100% { background: var(--green-soft); border-color: #d3dfb8; border-style: solid; color: var(--ink); } }
+
+/* ── route map view ──────────────────────────────────────────────── */
+.route-map { background: var(--paper-2); border: 1px solid var(--line); border-radius: 10px; padding: 18px; box-shadow: var(--shadow); }
+.route-map .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.route-map .head .lbl { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.route-map .map-frame { background: linear-gradient(135deg, #f0ecdc 0%, #e6e0c8 100%); border: 1px solid var(--line); border-radius: 8px; padding: 0; overflow: hidden; position: relative; aspect-ratio: 16 / 9; }
+.route-map svg { width: 100%; height: 100%; display: block; }
+.route-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.route-legend .item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.route-legend .swatch { width: 12px; height: 12px; border-radius: 2px; }
+.route-legend .nm { font-weight: 600; }
+.route-legend .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-left: auto; letter-spacing: 0.4px; }
 
 /* ── EVV panel ────────────────────────────────────────────────────── */
 .evv-grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; }
@@ -325,75 +357,183 @@ html, body {
           <div>
             <div class="label">→ Today · Wed Jun 10</div>
             <h2>Today's caregiver schedule</h2>
-            <p class="sub">All visits across all caregivers. Drag a patient onto an open slot to assign. Routing engine respects certification match, hours-of-service, and patient time-windows.</p>
+            <p class="sub">Routing engine respects certification match, hours-of-service, patient time-windows, and minimizes drive time. Open slots auto-fill with the best-fit caregiver in under 2 seconds.</p>
           </div>
           <div class="panel-actions">
+            <div class="view-toggle">
+              <button class="view-btn active" data-view="grid">Schedule</button>
+              <button class="view-btn" data-view="map">Route map</button>
+            </div>
             <button class="btn">Print routes</button>
-            <button class="btn primary">Auto-fill 7 open visits</button>
+            <button class="btn primary" id="autofill-btn">Auto-fill 7 open visits</button>
           </div>
         </div>
 
         <div class="kpis">
           <div class="kpi"><div class="label">Visits today</div><div class="num">47</div><div class="delta">+3 vs yesterday</div></div>
-          <div class="kpi"><div class="label">Caregivers active</div><div class="num">12</div><div class="delta">100% credentialed</div></div>
-          <div class="kpi"><div class="label">Open / unstaffed</div><div class="num" style="color:var(--rust);">7</div><div class="delta dn">Need to assign by 9am</div></div>
+          <div class="kpi"><div class="label">Drive time total</div><div class="num">4h 22m</div><div class="delta">-38m optimized</div></div>
+          <div class="kpi"><div class="label">Open · unstaffed</div><div class="num" style="color:var(--rust);" id="open-count">7</div><div class="delta dn">Assign by 9am</div></div>
           <div class="kpi"><div class="label">EVV compliance</div><div class="num" style="color:var(--green);">98.4%</div><div class="delta">+0.8% MoM</div></div>
         </div>
 
-        <div class="schedule-grid">
-          <div class="col-head">Caregiver</div>
-          <div class="col-head">Today's visits · 7am → 7pm</div>
+        <!-- ── GRID VIEW ── -->
+        <div class="schedule-view active" data-view="grid">
+          <div class="schedule-grid">
+            <div class="col-head">Caregiver</div>
+            <div class="col-head">Today's visits · 7am → 7pm · drive-time-optimized</div>
 
-          <div class="cg-cell name"><span class="av">MA</span><div><div class="nm">Maria Alvarez</div><div class="role">PCA · Spanish</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">7:30a · 60m</div><div class="vpt">Eleanor R.</div><div class="vtag">Personal care</div></div>
-            <div class="visit"><div class="vtime">9:15a · 90m</div><div class="vpt">Harold S.</div><div class="vtag">Medication mgmt</div></div>
-            <div class="visit"><div class="vtime">11:30a · 60m</div><div class="vpt">Beatrice K.</div><div class="vtag">Bathing assist</div></div>
-            <div class="visit amber"><div class="vtime">1:30p · 45m</div><div class="vpt">Frank D.</div><div class="vtag">Late start risk</div></div>
-            <div class="visit"><div class="vtime">3:00p · 90m</div><div class="vpt">Margaret W.</div><div class="vtag">Meal prep · companion</div></div>
+            <div class="cg-cell name"><span class="av">MA</span><div><div class="nm">Maria Alvarez</div><div class="role">PCA · Spanish</div><div class="util">5 visits · 4.5h · 14mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">7:30a · 60m</span><span class="vdrive">8mi</span></div><div class="vpt">Eleanor R.</div><div class="vaddr">412 W Oak St</div><div class="vtag">Personal care · vitals</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">9:15a · 90m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">Harold S.</div><div class="vaddr">218 Loma Vista</div><div class="vtag">Medication mgmt</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">11:30a · 60m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Beatrice K.</div><div class="vaddr">907 Mulberry Ln</div><div class="vtag">Bathing assist</div></div>
+              <div class="visit amber"><div class="vrow"><span class="vtime">1:30p · 45m</span><span class="vdrive">→ 6mi</span></div><div class="vpt">Frank D.</div><div class="vaddr">3204 Cedar Pk</div><div class="vtag">Late-start risk · traffic</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">3:00p · 90m</span><span class="vdrive">→ 4mi</span></div><div class="vpt">Margaret W.</div><div class="vaddr">521 Elm Ct</div><div class="vtag">Meal prep · companion</div></div>
+            </div>
+
+            <div class="cg-cell name"><span class="av" style="background:var(--green);">JT</span><div><div class="nm">Jennifer Thompson</div><div class="role">RN · Wound care</div><div class="util">5 visits · 3.5h · 18mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">8:00a · 45m</span><span class="vdrive">11mi</span></div><div class="vpt">Robert L.</div><div class="vaddr">1448 Bandera Rd</div><div class="vtag">Wound · post-op</div></div>
+              <div class="visit done"><div class="vrow"><span class="vtime">9:30a · 30m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Doris M.</div><div class="vaddr">2107 Vance Jackson</div><div class="vtag">Vitals · INR check</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">11:00a · 60m</span><span class="vdrive">→ 1mi</span></div><div class="vpt">Patricia G.</div><div class="vaddr">919 W Magnolia</div><div class="vtag">Wound · diabetic</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">1:00p · 60m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">William F.</div><div class="vaddr">3015 Olmos Dr</div><div class="vtag">Cath care</div></div>
+              <div class="visit open" data-time="3:00p" data-cg="JT">+ Open · 3:00p<br><span style="font-size:9.5px;">RN required</span></div>
+            </div>
+
+            <div class="cg-cell name"><span class="av" style="background:var(--rust);">DR</span><div><div class="nm">Daniel Reyes</div><div class="role">HHA · TB cert</div><div class="util">4 visits · 4.0h · 12mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">7:00a · 90m</span><span class="vdrive">5mi</span></div><div class="vpt">Catherine B.</div><div class="vaddr">704 Castle Ridge</div><div class="vtag">Bathing · ambulation</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">9:30a · 60m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Joseph H.</div><div class="vaddr">1206 Loma Linda</div><div class="vtag">Personal care</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">11:30a · 60m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">Linda O.</div><div class="vaddr">2818 N New Braunfels</div><div class="vtag">Bathing assist</div></div>
+              <div class="visit open" data-time="1:30p" data-cg="DR">+ Open · 1:30p<br><span style="font-size:9.5px;">PCA or HHA</span></div>
+              <div class="visit"><div class="vrow"><span class="vtime">3:30p · 60m</span><span class="vdrive">→ 4mi</span></div><div class="vpt">Nancy P.</div><div class="vaddr">645 W Ashby</div><div class="vtag">Light housekeeping</div></div>
+            </div>
+
+            <div class="cg-cell name"><span class="av" style="background:#8a3a78;">SK</span><div><div class="nm">Sophia Kim</div><div class="role">PT · Mobility</div><div class="util">4 visits · 4.0h · 16mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">8:30a · 60m</span><span class="vdrive">7mi</span></div><div class="vpt">Charles N.</div><div class="vaddr">2330 W Woodlawn</div><div class="vtag">Post-stroke gait</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">10:30a · 60m</span><span class="vdrive">→ 4mi</span></div><div class="vpt">Helen T.</div><div class="vaddr">1502 W Summit</div><div class="vtag">Balance · falls prev</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">1:00p · 60m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">George V.</div><div class="vaddr">410 Donaldson Ave</div><div class="vtag">Knee rehab post-op</div></div>
+              <div class="visit"><div class="vrow"><span class="vtime">3:30p · 60m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Lillian Z.</div><div class="vaddr">1235 N Flores</div><div class="vtag">Strength · arthritis</div></div>
+            </div>
+
+            <div class="cg-cell name"><span class="av" style="background:#2a5a2a;">CW</span><div><div class="nm">Carlos Whitfield</div><div class="role">PCA · Bilingual</div><div class="util">3 visits · 3.0h · 9mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">7:30a · 45m</span><span class="vdrive">4mi</span></div><div class="vpt">Theresa I.</div><div class="vaddr">812 Hammond Ave</div><div class="vtag">Companion · meds</div></div>
+              <div class="visit rust"><div class="vrow"><span class="vtime">9:00a · 60m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Edward C.</div><div class="vaddr">307 W Lullwood</div><div class="vtag">Refused last 2 · RN review</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">11:00a · 90m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">Florence Y.</div><div class="vaddr">2206 Pasadena Pl</div><div class="vtag">Personal care</div></div>
+              <div class="visit open" data-time="2:00p" data-cg="CW">+ Open · 2:00p<br><span style="font-size:9.5px;">Bilingual pref</span></div>
+              <div class="visit open" data-time="4:00p" data-cg="CW">+ Open · 4:00p<br><span style="font-size:9.5px;">PCA</span></div>
+            </div>
+
+            <div class="cg-cell name"><span class="av" style="background:#5a2a8a;">LM</span><div><div class="nm">Lakshmi Menon</div><div class="role">OT · Adaptive</div><div class="util">3 visits · 3.0h · 11mi</div></div></div>
+            <div class="visits-row">
+              <div class="visit done"><div class="vrow"><span class="vtime">9:00a · 60m</span><span class="vdrive">6mi</span></div><div class="vpt">Albert J.</div><div class="vaddr">1418 W Mistletoe</div><div class="vtag">ADL · hand therapy</div></div>
+              <div class="visit inprogress"><div class="vrow"><span class="vtime">11:00a · 60m</span><span class="vdrive">→ 2mi</span></div><div class="vpt">Vivian Q.</div><div class="vaddr">2622 N St Mary's</div><div class="vtag">Kitchen adapt eval</div></div>
+              <div class="visit open" data-time="1:30p" data-cg="LM">+ Open · 1:30p<br><span style="font-size:9.5px;">OT required</span></div>
+              <div class="visit"><div class="vrow"><span class="vtime">3:30p · 60m</span><span class="vdrive">→ 3mi</span></div><div class="vpt">Henry X.</div><div class="vaddr">521 W Lynwood</div><div class="vtag">Bath safety eval</div></div>
+            </div>
           </div>
+        </div>
 
-          <div class="cg-cell name"><span class="av" style="background:var(--green);">JT</span><div><div class="nm">Jennifer Thompson</div><div class="role">RN · Wound care</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">8:00a · 45m</div><div class="vpt">Robert L.</div><div class="vtag">Wound · post-op</div></div>
-            <div class="visit"><div class="vtime">9:30a · 30m</div><div class="vpt">Doris M.</div><div class="vtag">Vitals · INR check</div></div>
-            <div class="visit"><div class="vtime">11:00a · 60m</div><div class="vpt">Patricia G.</div><div class="vtag">Wound · diabetic</div></div>
-            <div class="visit"><div class="vtime">1:00p · 60m</div><div class="vpt">William F.</div><div class="vtag">Cath care</div></div>
-            <div class="visit open">+ Open slot · 3:00p</div>
-          </div>
+        <!-- ── MAP VIEW ── -->
+        <div class="schedule-view" data-view="map">
+          <div class="route-map">
+            <div class="head">
+              <div>
+                <div class="lbl">→ San Antonio · Bexar County · live</div>
+                <div style="font-family:'Fraunces',serif; font-size:18px; font-weight:500; margin-top:2px;">Today's caregiver routes</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--muted); letter-spacing:0.5px;">Optimized · saves 38 min vs naive</div>
+            </div>
+            <div class="map-frame">
+              <svg viewBox="0 0 800 460" xmlns="http://www.w3.org/2000/svg">
+                <!-- background grid + landmarks -->
+                <defs>
+                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#d4cdb8" stroke-width="0.5" opacity="0.4"/>
+                  </pattern>
+                </defs>
+                <rect width="800" height="460" fill="url(#grid)"/>
+                <!-- water (San Antonio River) -->
+                <path d="M 0 280 Q 200 260 380 290 T 800 270" stroke="#a8c4d8" stroke-width="14" fill="none" opacity="0.5"/>
+                <text x="50" y="276" font-family="JetBrains Mono" font-size="9" fill="#5a7088" letter-spacing="0.5" opacity="0.7">SAN ANTONIO RIVER</text>
+                <!-- I-410 loop -->
+                <ellipse cx="400" cy="230" rx="340" ry="190" stroke="#c0532b" stroke-width="2.5" fill="none" stroke-dasharray="6 4" opacity="0.45"/>
+                <text x="640" y="60" font-family="JetBrains Mono" font-size="10" fill="#c0532b" letter-spacing="0.5">I-410 LOOP</text>
+                <!-- downtown marker -->
+                <circle cx="400" cy="230" r="6" fill="#5a4a2a" opacity="0.55"/>
+                <text x="412" y="234" font-family="JetBrains Mono" font-size="10" fill="#5a4a2a" font-weight="600">Downtown</text>
 
-          <div class="cg-cell name"><span class="av" style="background:var(--rust);">DR</span><div><div class="nm">Daniel Reyes</div><div class="role">HHA · Cert TB-21</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">7:00a · 90m</div><div class="vpt">Catherine B.</div><div class="vtag">Bathing · ambulation</div></div>
-            <div class="visit"><div class="vtime">9:30a · 60m</div><div class="vpt">Joseph H.</div><div class="vtag">Personal care</div></div>
-            <div class="visit"><div class="vtime">11:30a · 60m</div><div class="vpt">Linda O.</div><div class="vtag">Bathing assist</div></div>
-            <div class="visit open">+ Open slot · 1:30p</div>
-            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Nancy P.</div><div class="vtag">Light housekeeping</div></div>
-          </div>
+                <!-- Maria Alvarez route (indigo) -->
+                <polyline points="200,140 240,170 280,200 360,240 460,300" fill="none" stroke="#3d35a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                <g fill="#3d35a6">
+                  <circle cx="200" cy="140" r="7"/><text x="180" y="128" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Eleanor R · ✓</text>
+                  <circle cx="240" cy="170" r="7"/><text x="244" y="167" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Harold S · ●</text>
+                  <circle cx="280" cy="200" r="6" fill="white" stroke="#3d35a6" stroke-width="2.5"/><text x="284" y="217" font-family="Plus Jakarta Sans" font-size="9.5" fill="#5a5040">Beatrice K · 11:30a</text>
+                  <circle cx="360" cy="240" r="6" fill="white" stroke="#3d35a6" stroke-width="2.5"/>
+                  <circle cx="460" cy="300" r="6" fill="white" stroke="#3d35a6" stroke-width="2.5"/><text x="466" y="304" font-family="Plus Jakarta Sans" font-size="9.5" fill="#5a5040">Margaret W · 3p</text>
+                </g>
 
-          <div class="cg-cell name"><span class="av" style="background:#8a3a78;">SK</span><div><div class="nm">Sophia Kim</div><div class="role">PT · Mobility</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">8:30a · 60m</div><div class="vpt">Charles N.</div><div class="vtag">Post-stroke gait</div></div>
-            <div class="visit"><div class="vtime">10:30a · 60m</div><div class="vpt">Helen T.</div><div class="vtag">Balance · falls prev</div></div>
-            <div class="visit"><div class="vtime">1:00p · 60m</div><div class="vpt">George V.</div><div class="vtag">Knee rehab post-op</div></div>
-            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Lillian Z.</div><div class="vtag">Strength · arthritis</div></div>
-          </div>
+                <!-- Jennifer Thompson route (green) -->
+                <polyline points="110,260 150,280 200,300 270,340 350,380" fill="none" stroke="#1f6b3a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                <g fill="#1f6b3a">
+                  <circle cx="110" cy="260" r="7"/><text x="44" y="263" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Robert L · ✓</text>
+                  <circle cx="150" cy="280" r="7"/><text x="98" y="297" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Doris M · ✓</text>
+                  <circle cx="200" cy="300" r="7" stroke="#1f6b3a" stroke-width="3" fill="#a8d4b5"/><text x="208" y="316" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1f6b3a" font-weight="600">Patricia G · ● live</text>
+                  <circle cx="270" cy="340" r="6" fill="white" stroke="#1f6b3a" stroke-width="2.5"/><text x="276" y="358" font-family="Plus Jakarta Sans" font-size="9.5" fill="#5a5040">William F · 1p</text>
+                  <circle cx="350" cy="380" r="6" fill="white" stroke="#1f6b3a" stroke-width="2.5" stroke-dasharray="3 2"/><text x="358" y="384" font-family="Plus Jakarta Sans" font-size="9.5" fill="#c0532b" font-weight="600">+ open 3p</text>
+                </g>
 
-          <div class="cg-cell name"><span class="av" style="background:#2a5a2a;">CW</span><div><div class="nm">Carlos Whitfield</div><div class="role">PCA · Bilingual</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">7:30a · 45m</div><div class="vpt">Theresa I.</div><div class="vtag">Companion · meds</div></div>
-            <div class="visit rust"><div class="vtime">9:00a · 60m</div><div class="vpt">Edward C.</div><div class="vtag">Refused last 2 visits</div></div>
-            <div class="visit"><div class="vtime">11:00a · 90m</div><div class="vpt">Florence Y.</div><div class="vtag">Personal care</div></div>
-            <div class="visit open">+ Open slot · 2:00p</div>
-            <div class="visit open">+ Open slot · 4:00p</div>
-          </div>
+                <!-- Daniel Reyes route (rust) -->
+                <polyline points="540,110 580,140 620,180 660,220 700,260" fill="none" stroke="#b8541d" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+                <g fill="#b8541d">
+                  <circle cx="540" cy="110" r="7"/><text x="450" y="103" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Catherine B · ✓</text>
+                  <circle cx="580" cy="140" r="7"/><text x="584" y="137" font-family="Plus Jakarta Sans" font-size="9.5" fill="#1a1612" font-weight="600">Joseph H · ●</text>
+                  <circle cx="620" cy="180" r="6" fill="white" stroke="#b8541d" stroke-width="2.5"/><text x="626" y="184" font-family="Plus Jakarta Sans" font-size="9.5" fill="#5a5040">Linda O · 11:30a</text>
+                  <circle cx="660" cy="220" r="6" fill="white" stroke="#b8541d" stroke-width="2.5" stroke-dasharray="3 2"/><text x="666" y="224" font-family="Plus Jakarta Sans" font-size="9.5" fill="#c0532b" font-weight="600">+ open 1:30p</text>
+                  <circle cx="700" cy="260" r="6" fill="white" stroke="#b8541d" stroke-width="2.5"/><text x="660" y="278" font-family="Plus Jakarta Sans" font-size="9.5" fill="#5a5040">Nancy P · 3:30p</text>
+                </g>
 
-          <div class="cg-cell name"><span class="av" style="background:#5a2a8a;">LM</span><div><div class="nm">Lakshmi Menon</div><div class="role">OT · Adaptive</div></div></div>
-          <div class="visits-row">
-            <div class="visit"><div class="vtime">9:00a · 60m</div><div class="vpt">Albert J.</div><div class="vtag">ADL · hand</div></div>
-            <div class="visit"><div class="vtime">11:00a · 60m</div><div class="vpt">Vivian Q.</div><div class="vtag">Kitchen adapt</div></div>
-            <div class="visit open">+ Open slot · 1:30p</div>
-            <div class="visit"><div class="vtime">3:30p · 60m</div><div class="vpt">Henry X.</div><div class="vtag">Bath safety eval</div></div>
+                <!-- Sophia Kim route (purple) -->
+                <polyline points="350,90 400,120 470,150 550,180 620,210" fill="none" stroke="#8a3a78" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                <g fill="#8a3a78">
+                  <circle cx="350" cy="90" r="6"/><circle cx="400" cy="120" r="6"/><circle cx="470" cy="150" r="6" fill="white" stroke="#8a3a78" stroke-width="2"/>
+                  <circle cx="550" cy="180" r="6" fill="white" stroke="#8a3a78" stroke-width="2"/><circle cx="620" cy="210" r="6" fill="white" stroke="#8a3a78" stroke-width="2"/>
+                </g>
+
+                <!-- Carlos Whitfield route (dark green) -->
+                <polyline points="170,380 220,400 290,420" fill="none" stroke="#2a5a2a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                <g fill="#2a5a2a">
+                  <circle cx="170" cy="380" r="6"/><circle cx="220" cy="400" r="6" fill="#fbe5e5" stroke="#b82828" stroke-width="2.5"/><circle cx="290" cy="420" r="6"/>
+                </g>
+
+                <!-- Lakshmi Menon route (deep purple) -->
+                <polyline points="490,360 560,390 640,400" fill="none" stroke="#5a2a8a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+                <g fill="#5a2a8a">
+                  <circle cx="490" cy="360" r="6"/><circle cx="560" cy="390" r="6"/><circle cx="640" cy="400" r="6" fill="white" stroke="#5a2a8a" stroke-width="2"/>
+                </g>
+
+                <!-- compass + scale -->
+                <g transform="translate(740,400)" font-family="JetBrains Mono" font-size="9" fill="#7a7068">
+                  <text x="0" y="0" letter-spacing="1.6" font-weight="600">N ▲</text>
+                  <text x="0" y="14">5 mi ━━━</text>
+                </g>
+              </svg>
+            </div>
+
+            <div class="route-legend">
+              <div class="item"><span class="swatch" style="background:#3d35a6;"></span><span class="nm">Maria Alvarez</span><span class="meta">5 · 14mi · 4h22m</span></div>
+              <div class="item"><span class="swatch" style="background:#1f6b3a;"></span><span class="nm">Jennifer Thompson</span><span class="meta">4+1 · 18mi · 3h30m</span></div>
+              <div class="item"><span class="swatch" style="background:#b8541d;"></span><span class="nm">Daniel Reyes</span><span class="meta">4+1 · 12mi · 4h00m</span></div>
+              <div class="item"><span class="swatch" style="background:#8a3a78;"></span><span class="nm">Sophia Kim</span><span class="meta">4 · 16mi · 4h00m</span></div>
+              <div class="item"><span class="swatch" style="background:#2a5a2a;"></span><span class="nm">Carlos Whitfield</span><span class="meta">3+2 · 9mi · 3h00m</span></div>
+              <div class="item"><span class="swatch" style="background:#5a2a8a;"></span><span class="nm">Lakshmi Menon</span><span class="meta">3+1 · 11mi · 3h00m</span></div>
+            </div>
+
+            <div style="margin-top:18px; padding:12px 14px; background:var(--green-soft); border-left:3px solid var(--green); border-radius: 0 6px 6px 0; font-size:12.5px;">
+              <strong>Engine notes:</strong> Route optimizer ran 4.2 sec. Considered 12 caregivers × 47 visits = 564 assignment combinations. Constraints respected: certification match (RN-required visits to RNs only), language preference (Eleanor R / Florence Y → Spanish-speakers), patient time-windows, caregiver hours-of-service caps. Net saving vs naive sequential: <strong style="color:var(--green);">38 minutes drive time / day</strong> = ~3.2 extra billable hours / week across the team.
+            </div>
           </div>
         </div>
       </div>
@@ -734,12 +874,64 @@ document.querySelectorAll('.pt-list .pt').forEach(p => {
   });
 });
 
-// Open-slot click (simulate assignment)
-document.querySelectorAll('.visit.open').forEach(v => {
-  v.addEventListener('click', () => {
-    v.classList.remove('open');
-    v.innerHTML = '<div class="vtime">' + v.textContent.match(/\d+:\d+\w/)[0] + ' · 60m</div><div class="vpt">Auto-assigned</div><div class="vtag">Match by certification ✓</div>';
+// View toggle (grid <-> map)
+document.querySelectorAll('.view-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    const view = b.dataset.view;
+    document.querySelectorAll('.view-btn').forEach(x => x.classList.toggle('active', x === b));
+    document.querySelectorAll('.schedule-view').forEach(v => v.classList.toggle('active', v.dataset.view === view));
   });
+});
+
+// Auto-fill sequential animation
+const AUTOFILL_MATCHES = {
+  "3:00p-JT": { nm: "Beatrice Okonkwo", tag: "RN · post-op vitals" },
+  "1:30p-DR": { nm: "Margaret Hines", tag: "HHA · personal care" },
+  "2:00p-CW": { nm: "Lucia Esparza", tag: "PCA · Spanish · companion" },
+  "4:00p-CW": { nm: "Helen Tao", tag: "PCA · light housekeeping" },
+  "1:30p-LM": { nm: "Henry Polk", tag: "OT · ADL · arm strength" }
+};
+function fillOpenSlot(v) {
+  return new Promise(resolve => {
+    const key = (v.dataset.time || "") + "-" + (v.dataset.cg || "");
+    const match = AUTOFILL_MATCHES[key] || { nm: "Auto-assigned", tag: "Cert match ✓" };
+    v.classList.add('assigning');
+    setTimeout(() => {
+      v.classList.remove('open', 'assigning');
+      v.innerHTML = '<div class="vrow"><span class="vtime">' + v.dataset.time + ' · 60m</span><span class="vdrive">→ ~3mi</span></div><div class="vpt">' + match.nm + '</div><div class="vaddr">Auto-routed</div><div class="vtag">' + match.tag + '</div>';
+      resolve();
+    }, 650);
+  });
+}
+const autofillBtn = document.getElementById('autofill-btn');
+if (autofillBtn) {
+  autofillBtn.addEventListener('click', async () => {
+    autofillBtn.disabled = true;
+    autofillBtn.textContent = "Solving 564 combinations...";
+    await new Promise(r => setTimeout(r, 700));
+    const opens = [...document.querySelectorAll('.visit.open')];
+    let remaining = opens.length;
+    for (const v of opens) {
+      await fillOpenSlot(v);
+      remaining--;
+      document.getElementById('open-count').textContent = remaining;
+      autofillBtn.textContent = remaining === 0 ? "All visits assigned ✓" : `Assigning... ${opens.length - remaining}/${opens.length}`;
+      await new Promise(r => setTimeout(r, 180));
+    }
+    autofillBtn.textContent = "All visits assigned ✓";
+    setTimeout(() => { autofillBtn.disabled = false; autofillBtn.textContent = "Auto-fill 7 open visits"; }, 2200);
+  });
+}
+
+// Manual click on a single open slot still works
+document.addEventListener('click', e => {
+  const v = e.target.closest('.visit.open');
+  if (v && !v.classList.contains('assigning')) {
+    fillOpenSlot(v).then(() => {
+      const remaining = document.querySelectorAll('.visit.open').length;
+      document.getElementById('open-count').textContent = remaining;
+    });
+  }
 });
 </script>
 
